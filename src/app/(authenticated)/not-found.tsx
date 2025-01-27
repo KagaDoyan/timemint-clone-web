@@ -18,8 +18,8 @@ export default function NotFound() {
           had its name changed, or is temporarily unavailable.
         </p>
         <Button asChild size="lg">
-          <Link href="/dashboard">
-            Back to Dashboard
+          <Link href="/home">
+            Back to Home
           </Link>
         </Button>
       </div>

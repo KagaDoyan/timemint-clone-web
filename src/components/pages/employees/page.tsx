@@ -273,8 +273,9 @@ export default function EmployeePage({ session }: EmployeePageProps) {
           columns={columns}
           data={employees}
           pageSize={limit}
-          onPageSizeChange={setLimit}
+          totalPages={totalPages}
           onPageChange={setPage}
+          onPageSizeChange={setLimit}
         />
       </div>
 

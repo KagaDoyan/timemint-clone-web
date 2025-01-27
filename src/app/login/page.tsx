@@ -18,7 +18,7 @@ export default async function LoginPage() {
           action={async (formData) => {
             "use server";
             await login(formData);
-            redirect("/dashboard");
+            redirect("/home");
           }}
           className="space-y-4"
         >

@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarFooter, 
-  SidebarGroup, 
-  SidebarHeader, 
-  SidebarMenu, 
-  SidebarMenuButton 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton
 } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
@@ -20,61 +20,98 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { handleLogout } from "@/app/(authenticated)/actions"
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  LogOut, 
-  ChevronRight, 
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  LogOut,
+  ChevronRight,
   User2,
   MoreHorizontal,
   Moon,
   Sun,
-  Calendar
+  Calendar,
+  MapPin,
+  TreePine,
+  Home
 } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const navigationGroups = [
   {
-    group: "Main",
+    group: {
+      name: "Main",
+      role: ["ADMIN", "USER", "MANAGER"],
+    },
     items: [
-      { 
-        title: "Dashboard", 
-        href: "/dashboard", 
+      {
+        title: "Home",
+        href: "/home",
         roles: ["ADMIN", "USER", "MANAGER"],
+        icon: Home
+      },
+      {
+        title: "Dashboard",
+        href: "/dashboard",
+        roles: ["ADMIN"],
         icon: LayoutDashboard
       },
     ]
   },
   {
-    group: "Management",
+    group: {
+      name: "Management",
+      role: ["ADMIN", "MANAGER"],
+    },
     items: [
-      { 
-        title: "Employees", 
-        href: "/employees", 
+      {
+        title: "Employees",
+        href: "/employees",
         roles: ["ADMIN", "MANAGER"],
         icon: Users
       },
-      { 
-        title: "Day of Work", 
-        href: "/day-of-work", 
+      {
+        title: "Holiday",
+        href: "/holiday",
+        roles: ["ADMIN"],
+        icon: TreePine
+      },
+      {
+        title: "Day of Work",
+        href: "/day-of-work",
         roles: ["ADMIN"],
         icon: Calendar
       },
-      { 
-        title: "Roles", 
-        href: "/roles", 
+      {
+        title: "Location",
+        href: "/location",
+        roles: ["ADMIN"],
+        icon: MapPin
+      },
+      {
+        title: "Attendance Policy",
+        href: "/attendance-policy",
+        roles: ["ADMIN"],
+        icon: Settings
+      },
+      {
+        title: "Roles",
+        href: "/roles",
         roles: ["ADMIN"],
         icon: Users
       },
+
     ]
   },
   {
-    group: "System",
+    group: {
+      name: "System",
+      role: ["ADMIN"],
+    },
     items: [
-      { 
-        title: "Settings", 
-        href: "/settings", 
+      {
+        title: "Settings",
+        href: "/settings",
         roles: ["ADMIN"],
         icon: Settings
       },
@@ -92,7 +129,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 const getAvatarColor = (letter: string) => {
   const colors = [
     'bg-red-100 text-red-600',
-    'bg-blue-100 text-blue-600', 
+    'bg-blue-100 text-blue-600',
     'bg-green-100 text-green-600',
     'bg-purple-100 text-purple-600',
     'bg-yellow-100 text-yellow-600',
@@ -101,17 +138,17 @@ const getAvatarColor = (letter: string) => {
     'bg-teal-100 text-teal-600',
     'bg-orange-100 text-orange-600',
   ]
-  
+
   // Use the character code to generate a consistent index
   const index = letter.toUpperCase().charCodeAt(0) % colors.length
   return colors[index]
 }
 
-export function AppSidebar({ 
-  userRoles = [], 
-  userName = 'User', 
+export function AppSidebar({
+  userRoles = [],
+  userName = 'User',
   userRole = 'Guest',
-  ...props 
+  ...props
 }: AppSidebarProps) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
@@ -119,28 +156,37 @@ export function AppSidebar({
   const avatarColor = getAvatarColor(firstLetter)
 
   // Filter navigation items based on user roles
-  const filteredNavigation = navigationGroups.map(group => ({
-    ...group,
-    items: group.items.filter(item => 
-      item.roles.some(role => userRoles.includes(role))
-    )
-  })).filter(group => group.items.length > 0)
+  const filteredNavigation = navigationGroups
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => 
+        item.roles.some(role => userRoles.includes(role))
+      )
+    }))
+    .filter(group => {
+      // If group has a role property, check if user has any of those roles
+      if (group.group.role) {
+        return group.group.role.some(role => userRoles.includes(role)) && group.items.length > 0;
+      }
+      // If no role specified for group, keep the group
+      return group.items.length > 0;
+    });
 
   return (
     <Sidebar {...props} className="bg-background text-foreground">
       <SidebarHeader>
         <div className="p-4 flex items-center">
           <div className="flex-grow">
-            <div className="font-semibold text-lg">My App</div>
+            <div className="font-semibold text-lg">Attendance App</div>
           </div>
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         {filteredNavigation.map((group) => (
-          <SidebarGroup key={group.group}>
+          <SidebarGroup key={group.group.name}>
             <div className="text-xs text-muted-foreground uppercase px-4 py-2">
-              {group.group}
+              {group.group.name}
             </div>
             <SidebarMenu>
               {group.items.map((item) => (
@@ -154,16 +200,16 @@ export function AppSidebar({
                   <Link href={item.href}>
                     <div className={`flex items-center justify-between w-full px-4 py-2 transition-all duration-300 ease-in-out ${pathname === item.href ? 'bg-primary/10 scale-[1.02] rounded-lg' : 'rounded-lg'}`}>
                       <div className="flex items-center">
-                        <item.icon 
-                          className={`mr-3 transition-all duration-300 ease-in-out ${pathname === item.href ? 'text-primary scale-110' : ''}`} 
-                          size={20} 
+                        <item.icon
+                          className={`mr-3 transition-all duration-300 ease-in-out ${pathname === item.href ? 'text-primary scale-110' : ''}`}
+                          size={20}
                         />
                         <span className={`text-sm transition-all duration-300 ease-in-out ${pathname === item.href ? 'font-semibold text-primary' : ''}`}>
                           {item.title}
                         </span>
                       </div>
-                      <ChevronRight 
-                        size={16} 
+                      <ChevronRight
+                        size={16}
                         className={`text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out ${pathname === item.href ? 'opacity-100 text-primary scale-110' : ''}`}
                       />
                     </div>
@@ -174,7 +220,7 @@ export function AppSidebar({
           </SidebarGroup>
         ))}
       </SidebarContent>
-      
+
       <SidebarFooter>
         <SidebarMenu>
           <div className="px-4 py-3 border-t">
@@ -208,7 +254,7 @@ export function AppSidebar({
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
                     className="flex items-center justify-between"
                   >
@@ -222,7 +268,7 @@ export function AppSidebar({
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault()
                       handleLogout()

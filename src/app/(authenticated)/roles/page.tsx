@@ -1,4 +1,4 @@
-import RoleManagement from '@/components/roles/RoleManagement';
+import RoleManagement from '@/components/pages/roles/page';
 import { getSession } from '@/lib/lib';
 import { redirect } from 'next/navigation';
 

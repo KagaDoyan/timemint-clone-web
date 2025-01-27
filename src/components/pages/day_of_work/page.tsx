@@ -123,7 +123,7 @@ export default function DayOfWork({ session }: DayOfWorkPageProps) {
         page: page.toString(),
       });
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-work/all?${queryParams}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-works/all?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ export default function DayOfWork({ session }: DayOfWorkPageProps) {
         return;
       }
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-work${isEditing ? `/${currentDayOfWork.id}` : ''}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-works${isEditing ? `/${currentDayOfWork.id}` : ''}`;
       const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -210,7 +210,7 @@ export default function DayOfWork({ session }: DayOfWorkPageProps) {
     if (!dayOfWorkToDelete) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-work/${dayOfWorkToDelete.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/day-of-works/${dayOfWorkToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -254,14 +254,10 @@ export default function DayOfWork({ session }: DayOfWorkPageProps) {
       <DataTable 
         columns={columns} 
         data={dayOfWorks} 
-        isLoading={isLoading}
-        pagination={{
-          page: currentPage,
-          totalPages,
-          totalRows,
-          onPageChange: setPage,
-          onLimitChange: setLimit,
-        }}
+        pageSize={limit}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={setLimit}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -21,6 +21,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   pageSize: number
+  totalPages: number
   onPageSizeChange: (newSize: number) => void
   onPageChange: (newPage: number) => void
 }
@@ -29,6 +30,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   pageSize,
+  totalPages,
   onPageSizeChange,
   onPageChange,
 }: DataTableProps<TData, TValue>) {
@@ -37,10 +39,10 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(data.length / pageSize),
+    pageCount: totalPages,
     onPaginationChange: (updater) => {
-      const newPagination = typeof updater === 'function' 
-        ? updater({ pageSize, pageIndex: 0 }) 
+      const newPagination = typeof updater === 'function'
+        ? updater({ pageSize, pageIndex: 0 })
         : updater;
       onPageChange(newPagination.pageIndex);
       onPageSizeChange(newPagination.pageSize);
@@ -66,9 +68,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
