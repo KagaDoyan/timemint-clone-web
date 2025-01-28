@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
 import { toast } from "sonner";
+import { DataTableDemo } from '@/components/data-table-demo';
 
 interface Employee {
   id: number;
@@ -269,24 +270,23 @@ export default function EmployeePage({ session }: EmployeePageProps) {
   };
 
   return (
-    <div className="w-full h-full p-4">
+    <div className="p-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <h1 className="text-2xl font-semibold">Employees</h1>
         <Button onClick={openCreateDialog} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" /> Add Employee
         </Button>
       </div>
-      
-      <div className="w-full">
-        <DataTable
-          columns={columns}
-          data={employees}
-          pageSize={limit}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          onPageSizeChange={setLimit}
-        />
-      </div>
+
+      <DataTable
+        columns={columns}
+        data={employees}
+        pageSize={limit}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={setLimit}
+      />
+
 
       <Dialog
         open={isDialogOpen}

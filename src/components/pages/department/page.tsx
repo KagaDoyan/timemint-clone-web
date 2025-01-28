@@ -98,7 +98,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
     }
   ], []);
 
-  // Fetch roles
+  // Fetch departments
   const fetchDepartments = async (limit: number = 10, page: number = 1, nameFilter: string = '') => {
     try {
       setIsLoading(true);
@@ -117,7 +117,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch roles');
+        throw new Error('Failed to fetch departments');
       }
 
       const result: DepartmentPaginationResponse = await response.json();
@@ -128,14 +128,14 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
         setTotalRows(result.data.totalRows);
         setCurrentPage(result.data.page);
       } else {
-        toast.error(result.error || "Failed to fetch roles");
+        toast.error(result.error || "Failed to fetch departments");
         setDepartments([]);
         setTotalPages(0);
         setTotalRows(0);
         setCurrentPage(1);
       }
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      console.error('Error fetching departments:', error);
       toast.error("Network error occurred");
       setDepartments([]);
       setTotalPages(0);
@@ -150,7 +150,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
     fetchDepartments(limit, page, nameFilter);
   }, [limit, page, nameFilter]);
 
-  // Create or update role
+  // Create or update department
   const handleSaveDepartment = async () => {
     try {
       if (!currentDepartment.name?.trim()) {
@@ -181,7 +181,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Role updated successfully" : "Role created successfully");
+        toast.success(isEditing ? "department updated successfully" : "department created successfully");
         fetchDepartments(limit, page, nameFilter);
         setIsDialogOpen(false);
         setCurrentDepartment({});
@@ -190,12 +190,12 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
         toast.error(result.error || "Operation failed");
       }
     } catch (error) {
-      console.error('Error saving role:', error);
+      console.error('Error saving department:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
 
-  // Delete role
+  // Delete department
   const handleDeleteDepartment = async (id: string) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/departments/${id}`, {
@@ -214,7 +214,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Role deleted successfully");
+        toast.success("department deleted successfully");
         fetchDepartments(limit, page, nameFilter);
         setIsDeleteDialogOpen(false);
         setDepartmentToDelete(null);
@@ -222,7 +222,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
         toast.error(result.error || "Deletion failed");
       }
     } catch (error) {
-      console.error('Error deleting role:', error);
+      console.error('Error deleting department:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
@@ -237,9 +237,9 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
   return (
     <div className="p-4 sm:p-8 space-y-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Role Management</h1>
+        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">department Management</h1>
         <Button onClick={openCreateDialog} className="flex items-center gap-2">
-          <Plus size={16} /> Create Role
+          <Plus size={16} /> Create department
         </Button>
       </div>
 
@@ -265,7 +265,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Edit Role' : 'Create Role'}
+              {isEditing ? 'Edit department' : 'Create department'}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -280,7 +280,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
                   setCurrentDepartment(prev => ({ ...prev, name: e.target.value }))
                 }
                 className="col-span-3"
-                placeholder="Enter role name"
+                placeholder="Enter department name"
               />
             </div>
           </div>
@@ -308,7 +308,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
               Are you sure?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the role.
+              This will permanently delete the department.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
