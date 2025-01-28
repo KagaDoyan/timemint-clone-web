@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
 import { toast } from "sonner";
-import { DataTableDemo } from '@/components/data-table-demo';
+import DataTableDemo from '@/components/data-table-demo';
 
 interface Employee {
   id: number;
@@ -278,14 +278,16 @@ export default function EmployeePage({ session }: EmployeePageProps) {
         </Button>
       </div>
 
-      <DataTable
+      {/* <DataTable
         columns={columns}
         data={employees}
         pageSize={limit}
         totalPages={totalPages}
         onPageChange={setPage}
         onPageSizeChange={setLimit}
-      />
+      /> */}
+
+      <DataTableDemo />
 
 
       <Dialog
