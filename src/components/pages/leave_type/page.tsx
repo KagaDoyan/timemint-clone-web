@@ -25,17 +25,22 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
 import { toast } from "sonner";
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 
-interface Role {
+interface Leave_type {
   id: number;
-  name: string;
+  leave_type: string;
+  description: string;
+  payable: boolean;
+  annually_max: number;
 }
 
-interface RolePaginationResponse {
+interface LeaveTypePaginationResponse {
   data: {
     limit: number;
     page: number;
-    data: Role[];
+    data: Leave_type[];
     totalPages: number;
     totalRows: number;
   };
@@ -43,48 +48,64 @@ interface RolePaginationResponse {
   error?: string;
 }
 
-interface RoleManagementProps {
+interface Leave_typeManagementProps {
   session: any;
 }
 
-export default function RoleManagement({ session }: RoleManagementProps) {
+export default function LeavetypeManagement({ session }: Leave_typeManagementProps) {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [leave_types, setLeave_types] = useState< Leave_type[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentRole, setCurrentRole] = useState<Partial<Role>>({});
+  const [currentLeave_type, setCurrentLeave_type] = useState<Partial<Leave_type>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
-  const [nameFilter, setNameFilter] = useState('');
+  const [leave_typeToDelete, setLeave_typeToDelete] = useState<Leave_type | null>(null);
+  const [leave_typeFilter, setLeave_typeFilter] = useState('');
 
-  const columns = useMemo<ColumnDef<Role>[]>(() => [
+  const columns = useMemo<ColumnDef<Leave_type>[]>(() => [
     {
       accessorKey: 'id',
       header: 'ID',
     },
     {
-      accessorKey: 'name',
-      header: 'Name',
+      accessorKey: 'leave_type',
+      header: 'Leave Type',
+    },
+    {
+      accessorKey: 'description',
+      header: 'Description',
+    },
+    {
+      accessorKey: 'annually_max',
+      header: 'Annual Max',
+    },
+    {
+      accessorKey: 'payable',
+      header: 'Paid',
+      cell: ({ row }) => {
+        const leave_type = row.original;
+        return leave_type.payable ? 'Yes' : 'No';
+      },
     },
     {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const role = row.original;
+        const leave_type = row.original;
 
         const handleEdit = () => {
-          setCurrentRole(role);
+          setCurrentLeave_type(leave_type);
           setIsEditing(true);
           setIsDialogOpen(true);
         };
 
         const handleDeleteConfirmation = () => {
-          setRoleToDelete(role);
+          setLeave_typeToDelete(leave_type);
           setIsDeleteDialogOpen(true);
         };
 
@@ -99,7 +120,7 @@ export default function RoleManagement({ session }: RoleManagementProps) {
   ], []);
 
   // Fetch roles
-  const fetchRoles = async (limit: number = 10, page: number = 1, nameFilter: string = '') => {
+  const fetchLeave_types = async (limit: number = 10, page: number = 1, nameFilter: string = '') => {
     try {
       setIsLoading(true);
       const queryParams = new URLSearchParams({
@@ -108,7 +129,7 @@ export default function RoleManagement({ session }: RoleManagementProps) {
         ...(nameFilter && { name: nameFilter })
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/roles/all?${queryParams}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-types/all?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -117,27 +138,27 @@ export default function RoleManagement({ session }: RoleManagementProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch roles');
+        throw new Error('Failed to fetch leave types');
       }
 
-      const result: RolePaginationResponse = await response.json();
+      const result: LeaveTypePaginationResponse = await response.json();
 
       if (result.status && result.data) {
-        setRoles(result.data.data);
+        setLeave_types(result.data.data);
         setTotalPages(result.data.totalPages);
         setTotalRows(result.data.totalRows);
         setCurrentPage(result.data.page);
       } else {
-        toast.error(result.error || "Failed to fetch roles");
-        setRoles([]);
+        toast.error(result.error || "Failed to fetch leave types");
+        setLeave_types([]);
         setTotalPages(0);
         setTotalRows(0);
         setCurrentPage(1);
       }
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      console.error('Error fetching leave types:', error);
       toast.error("Network error occurred");
-      setRoles([]);
+      setLeave_types([]);
       setTotalPages(0);
       setTotalRows(0);
       setCurrentPage(1);
@@ -147,18 +168,18 @@ export default function RoleManagement({ session }: RoleManagementProps) {
   };
 
   useEffect(() => {
-    fetchRoles(limit, page, nameFilter);
-  }, [limit, page, nameFilter]);
+    fetchLeave_types(limit, page);
+  }, [limit, page]);
 
   // Create or update role
-  const handleSaveRole = async () => {
+  const handleSaveLeave_type = async () => {
     try {
-      if (!currentRole.name?.trim()) {
-        toast.error("Role name is required");
+      if (!currentLeave_type.leave_type?.trim()) {
+        toast.error("Leave type name is required");
         return;
       }
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/roles${isEditing ? `/${currentRole.id}` : ''}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-types${isEditing ? `/${currentLeave_type.id}` : ''}`;
       const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -168,8 +189,11 @@ export default function RoleManagement({ session }: RoleManagementProps) {
           'Authorization': `Bearer ${session.user.accessToken}`,
         },
         body: JSON.stringify({
-          name: currentRole.name.trim(),
-          ...(isEditing && { id: currentRole.id })
+          leave_type: currentLeave_type.leave_type.trim(),
+          description: currentLeave_type.description?.trim() || '',
+          payable: currentLeave_type.payable,
+          annually_max: currentLeave_type.annually_max,
+          ...(isEditing && { id: currentLeave_type.id })
         })
       });
 
@@ -181,24 +205,24 @@ export default function RoleManagement({ session }: RoleManagementProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Role updated successfully" : "Role created successfully");
-        fetchRoles(limit, page, nameFilter);
+        toast.success(isEditing ? "Leave type updated successfully" : "Leave type created successfully");
+        fetchLeave_types(limit, page);
         setIsDialogOpen(false);
-        setCurrentRole({});
+        setCurrentLeave_type({});
         setIsEditing(false);
       } else {
         toast.error(result.error || "Operation failed");
       }
     } catch (error) {
-      console.error('Error saving role:', error);
+      console.error('Error saving leave type:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
 
   // Delete role
-  const handleDeleteRole = async (id: string) => {
+  const handleDeleteLeave_type = async (id: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/roles/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-types/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -214,22 +238,22 @@ export default function RoleManagement({ session }: RoleManagementProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Role deleted successfully");
-        fetchRoles(limit, page, nameFilter);
+        toast.success("Leave type deleted successfully");
+        fetchLeave_types(limit, page);
         setIsDeleteDialogOpen(false);
-        setRoleToDelete(null);
+        setLeave_typeToDelete(null);
       } else {
         toast.error(result.error || "Deletion failed");
       }
     } catch (error) {
-      console.error('Error deleting role:', error);
+      console.error('Error deleting leave type:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
 
   // Open create dialog
   const openCreateDialog = () => {
-    setCurrentRole({});
+    setCurrentLeave_type({});
     setIsEditing(false);
     setIsDialogOpen(true);
   };
@@ -237,15 +261,15 @@ export default function RoleManagement({ session }: RoleManagementProps) {
   return (
     <div className="p-4 sm:p-8 space-y-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Role Management</h1>
+        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Leave Type Management</h1>
         <Button onClick={openCreateDialog} className="flex items-center gap-2">
-          <Plus size={16} /> Create Role
+          <Plus size={16} /> Create Leave Type
         </Button>
       </div>
 
       <DataTable
         columns={columns}
-        data={roles}
+        data={leave_types}
         pageSize={limit}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
@@ -257,7 +281,7 @@ export default function RoleManagement({ session }: RoleManagementProps) {
         onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) {
-            setCurrentRole({});
+            setCurrentLeave_type({});
             setIsEditing(false);
           }
         }}
@@ -270,17 +294,60 @@ export default function RoleManagement({ session }: RoleManagementProps) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
+              <Label htmlFor="leave_type" className="text-right">
+                Leave Type
               </Label>
               <Input
-                id="name"
-                value={currentRole.name || ''}
+                id="leave_type"
+                value={currentLeave_type.leave_type || ''}
                 onChange={(e) =>
-                  setCurrentRole(prev => ({ ...prev, name: e.target.value }))
+                  setCurrentLeave_type(prev => ({ ...prev, leave_type: e.target.value }))
                 }
                 className="col-span-3"
-                placeholder="Enter role name"
+                placeholder="Enter leave type name"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                rows={3}
+                value={currentLeave_type.description || ''}
+                onChange={(e) =>
+                  setCurrentLeave_type(prev => ({ ...prev, description: e.target.value }))
+                }
+                className="col-span-3"
+                placeholder="Enter leave type description"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Annual Max
+              </Label>
+              <Input
+                id='annual_max'
+                type='number'
+                value={currentLeave_type.annually_max || ''}
+                onChange={(e) =>
+                  setCurrentLeave_type(prev => ({ ...prev, annually_max: Number(e.target.value) }))
+                }
+                className="col-span-3"
+              />
+            </div>
+            {/* switch for paid or nit paid */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="payable" className="text-right">
+                Payable
+              </Label>
+              <Switch
+                id="payable"
+                checked={currentLeave_type.payable}
+                onCheckedChange={(checked) =>
+                  setCurrentLeave_type(prev => ({ ...prev, payable: checked }))
+                }
+                className="col-span-3"
               />
             </div>
           </div>
@@ -292,8 +359,8 @@ export default function RoleManagement({ session }: RoleManagementProps) {
               Cancel
             </Button>
             <Button
-              onClick={handleSaveRole}
-              disabled={!currentRole.name}
+              onClick={handleSaveLeave_type} 
+              disabled={!currentLeave_type.leave_type}
             >
               Save
             </Button>
@@ -308,13 +375,13 @@ export default function RoleManagement({ session }: RoleManagementProps) {
               Are you sure?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the role.
+              This will permanently delete the leave type.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => roleToDelete && handleDeleteRole(roleToDelete.id.toString())}
+              onClick={() => leave_typeToDelete && handleDeleteLeave_type(leave_typeToDelete.id.toString())}
             >
               Delete
             </AlertDialogAction>

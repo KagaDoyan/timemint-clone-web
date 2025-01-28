@@ -26,33 +26,16 @@ import {
 import { Plus } from 'lucide-react';
 import { toast } from "sonner";
 
-interface Employee {
+interface Department {
   id: number;
-  employee_no: string;
   name: string;
-  email: string;
-  phone: string;
-  address: string;
-  position: string;
-  role_id: number;
-  role: {
-    id: number;
-    name: string;
-  };
-  department_id: number;
-  department: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at: string;
 }
 
-interface EmployeePaginationResponse {
+interface DepartmentPaginationResponse {
   data: {
     limit: number;
     page: number;
-    data: Employee[];
+    data: Department[];
     totalPages: number;
     totalRows: number;
   };
@@ -60,71 +43,48 @@ interface EmployeePaginationResponse {
   error?: string;
 }
 
-interface EmployeePageProps {
+interface DepartmentPageProps {
   session: any;
 }
 
-export default function EmployeePage({ session }: EmployeePageProps) {
+export default function DepartmentManagement({ session }: DepartmentPageProps) {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState<Partial<Employee>>({});
+  const [currentDepartment, setCurrentDepartment] = useState<Partial<Department>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
+  const [nameFilter, setNameFilter] = useState('');
 
-  const columns = useMemo<ColumnDef<Employee>[]>(() => [
+  const columns = useMemo<ColumnDef<Department>[]>(() => [
     {
-      accessorKey: 'employee_no',
-      header: 'Employee No.',
+      accessorKey: 'id',
+      header: 'ID',
     },
     {
       accessorKey: 'name',
       header: 'Name',
     },
     {
-      accessorKey: 'email',
-      header: 'Email',
-    },
-    {
-      accessorKey: 'phone',
-      header: 'Phone',
-    },
-    {
-      accessorKey: 'address',
-      header: 'Address',
-    },
-    {
-      accessorKey: 'department.name',
-      header: 'Department',
-    },
-    {
-      accessorKey: 'position',
-      header: 'Position',
-    },
-    {
-      accessorKey: 'role.name',
-      header: 'Role',
-    },
-    {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const employee = row.original;
+        const department = row.original;
 
         const handleEdit = () => {
-          setCurrentEmployee(employee);
+          setCurrentDepartment(department);
           setIsEditing(true);
           setIsDialogOpen(true);
         };
 
         const handleDeleteConfirmation = () => {
-          setEmployeeToDelete(employee);
+          setDepartmentToDelete(department);
           setIsDeleteDialogOpen(true);
         };
 
@@ -138,57 +98,67 @@ export default function EmployeePage({ session }: EmployeePageProps) {
     }
   ], []);
 
-  const fetchData = async () => {
+  // Fetch roles
+  const fetchDepartments = async (limit: number = 10, page: number = 1, nameFilter: string = '') => {
     try {
+      setIsLoading(true);
       const queryParams = new URLSearchParams({
         limit: limit.toString(),
         page: page.toString(),
+        ...(nameFilter && { name: nameFilter })
       });
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/all?${queryParams}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/departments/all?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.user.accessToken}`,
-        },
+        }
       });
 
-      if (!res.ok) {
-        throw new Error('Failed to fetch employees');
+      if (!response.ok) {
+        throw new Error('Failed to fetch roles');
       }
 
-      const responseData: EmployeePaginationResponse = await res.json();
+      const result: DepartmentPaginationResponse = await response.json();
 
-      if (responseData.status && responseData.data) {
-        setEmployees(responseData.data.data);
-        setTotalPages(responseData.data.totalPages);
-        setTotalRows(responseData.data.totalRows);
-        setCurrentPage(responseData.data.page);
+      if (result.status && result.data) {
+        setDepartments(result.data.data);
+        setTotalPages(result.data.totalPages);
+        setTotalRows(result.data.totalRows);
+        setCurrentPage(result.data.page);
       } else {
-        setEmployees([]);
+        toast.error(result.error || "Failed to fetch roles");
+        setDepartments([]);
         setTotalPages(0);
         setTotalRows(0);
+        setCurrentPage(1);
       }
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      setEmployees([]);
+      console.error('Error fetching roles:', error);
+      toast.error("Network error occurred");
+      setDepartments([]);
       setTotalPages(0);
       setTotalRows(0);
+      setCurrentPage(1);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [limit, page]);
+    fetchDepartments(limit, page, nameFilter);
+  }, [limit, page, nameFilter]);
 
-  const handleSaveEmployee = async () => {
+  // Create or update role
+  const handleSaveDepartment = async () => {
     try {
-      if (!currentEmployee.name?.trim()) {
-        toast.error("Employee name is required");
+      if (!currentDepartment.name?.trim()) {
+        toast.error("Department name is required");
         return;
       }
 
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees${isEditing ? `/${currentEmployee.id}` : ''}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/departments${isEditing ? `/${currentDepartment.id}` : ''}`;
       const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -198,14 +168,8 @@ export default function EmployeePage({ session }: EmployeePageProps) {
           'Authorization': `Bearer ${session.user.accessToken}`,
         },
         body: JSON.stringify({
-          employee_id: currentEmployee.employee_no,
-          name: currentEmployee.name.trim(),
-          email: currentEmployee.email,
-          phone: currentEmployee.phone,
-          address: currentEmployee.address,
-          position: currentEmployee.position,
-          role_id: currentEmployee.role_id,
-          ...(isEditing && { id: currentEmployee.id })
+          name: currentDepartment.name.trim(),
+          ...(isEditing && { id: currentDepartment.id })
         })
       });
 
@@ -217,23 +181,24 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Employee updated successfully" : "Employee created successfully");
-        fetchData();
+        toast.success(isEditing ? "Role updated successfully" : "Role created successfully");
+        fetchDepartments(limit, page, nameFilter);
         setIsDialogOpen(false);
-        setCurrentEmployee({});
+        setCurrentDepartment({});
         setIsEditing(false);
       } else {
         toast.error(result.error || "Operation failed");
       }
     } catch (error) {
-      console.error('Error saving employee:', error);
+      console.error('Error saving role:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
 
-  const handleDeleteEmployee = async (id: string) => {
+  // Delete role
+  const handleDeleteDepartment = async (id: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/departments/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -249,51 +214,50 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Employee deleted successfully");
-        fetchData();
+        toast.success("Role deleted successfully");
+        fetchDepartments(limit, page, nameFilter);
         setIsDeleteDialogOpen(false);
-        setEmployeeToDelete(null);
+        setDepartmentToDelete(null);
       } else {
         toast.error(result.error || "Deletion failed");
       }
     } catch (error) {
-      console.error('Error deleting employee:', error);
+      console.error('Error deleting role:', error);
       toast.error(error instanceof Error ? error.message : "Network error occurred");
     }
   };
 
+  // Open create dialog
   const openCreateDialog = () => {
-    setCurrentEmployee({});
+    setCurrentDepartment({});
     setIsEditing(false);
     setIsDialogOpen(true);
   };
 
   return (
-    <div className="w-full h-full p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h1 className="text-2xl font-semibold">Employees</h1>
-        <Button onClick={openCreateDialog} className="w-full sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" /> Add Employee
+    <div className="p-4 sm:p-8 space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Role Management</h1>
+        <Button onClick={openCreateDialog} className="flex items-center gap-2">
+          <Plus size={16} /> Create Role
         </Button>
       </div>
-      
-      <div className="w-full">
-        <DataTable
-          columns={columns}
-          data={employees}
-          pageSize={limit}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          onPageSizeChange={setLimit}
-        />
-      </div>
+
+      <DataTable
+        columns={columns}
+        data={departments}
+        pageSize={limit}
+        totalPages={totalPages}
+        onPageSizeChange={setLimit}
+        onPageChange={setPage}
+      />
 
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) {
-            setCurrentEmployee({});
+            setCurrentDepartment({});
             setIsEditing(false);
           }
         }}
@@ -301,7 +265,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Edit Employee' : 'Create Employee'}
+              {isEditing ? 'Edit Role' : 'Create Role'}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -311,12 +275,12 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               </Label>
               <Input
                 id="name"
-                value={currentEmployee.name || ''}
+                value={currentDepartment.name || ''}
                 onChange={(e) =>
-                  setCurrentEmployee(prev => ({ ...prev, name: e.target.value }))
+                  setCurrentDepartment(prev => ({ ...prev, name: e.target.value }))
                 }
                 className="col-span-3"
-                placeholder="Enter employee name"
+                placeholder="Enter role name"
               />
             </div>
           </div>
@@ -328,8 +292,8 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               Cancel
             </Button>
             <Button
-              onClick={handleSaveEmployee}
-              disabled={!currentEmployee.name}
+              onClick={handleSaveDepartment}
+              disabled={!currentDepartment.name}
             >
               Save
             </Button>
@@ -344,13 +308,13 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               Are you sure?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the employee.
+              This will permanently delete the role.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => employeeToDelete && handleDeleteEmployee(employeeToDelete.id.toString())}
+              onClick={() => departmentToDelete && handleDeleteDepartment(departmentToDelete.id.toString())}
             >
               Delete
             </AlertDialogAction>

@@ -33,7 +33,8 @@ import {
   Calendar,
   MapPin,
   TreePine,
-  Home
+  Home,
+  Network
 } from "lucide-react"
 import { useTheme } from "next-themes"
 
@@ -56,6 +57,12 @@ const navigationGroups = [
         roles: ["ADMIN"],
         icon: LayoutDashboard
       },
+      {
+        title: "Leave",
+        href: "/leave",
+        roles: ["ADMIN"],
+        icon: Calendar
+      },
     ]
   },
   {
@@ -77,23 +84,35 @@ const navigationGroups = [
         icon: TreePine
       },
       {
-        title: "Day of Work",
-        href: "/day-of-work",
+        title: "Departments",
+        href: "/departments",
+        roles: ["ADMIN"],
+        icon: Network
+      },
+      {
+        title: "Leave Type",
+        href: "/leave_type",
         roles: ["ADMIN"],
         icon: Calendar
       },
-      {
-        title: "Location",
-        href: "/location",
-        roles: ["ADMIN"],
-        icon: MapPin
-      },
-      {
-        title: "Attendance Policy",
-        href: "/attendance-policy",
-        roles: ["ADMIN"],
-        icon: Settings
-      },
+      // {
+      //   title: "Day of Work",
+      //   href: "/day-of-work",
+      //   roles: ["ADMIN"],
+      //   icon: Calendar
+      // },
+      // {
+      //   title: "Location",
+      //   href: "/location",
+      //   roles: ["ADMIN"],
+      //   icon: MapPin
+      // },
+      // {
+      //   title: "Attendance Policy",
+      //   href: "/attendance-policy",
+      //   roles: ["ADMIN"],
+      //   icon: Settings
+      // },
       {
         title: "Roles",
         href: "/roles",
@@ -159,7 +178,7 @@ export function AppSidebar({
   const filteredNavigation = navigationGroups
     .map(group => ({
       ...group,
-      items: group.items.filter(item => 
+      items: group.items.filter(item =>
         item.roles.some(role => userRoles.includes(role))
       )
     }))
