@@ -19,30 +19,15 @@ import { cn } from '@/lib/utils';
 import { Calendar1 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { Card } from '@/components/ui/card';
-import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
+import { DataTable } from '@/components/data-table';
+import { LeaveReqest } from '@/components/model';
 
 interface LeavePageProps {
     session: any
 }
 
-interface LeaveReqest {
-    id: number
-    employee_id: number
-    employee: Employee
-    leave_type_id: number
-    leave_type: LeaveType
-    start_date: string
-    end_date: string
-    reason: string
-    status: string
-    full_day: boolean
-    created_at: string
-    updated_at: string
-    reviewer_id: number
-    reviewer: Employee
-}
+
 
 export interface Employee {
     id: number
@@ -328,6 +313,7 @@ export default function LeavePage({ session }: LeavePageProps) {
                 <DataTable
                     columns={columns}
                     data={leaverequests}
+                    currentPage={page}
                     pageSize={limit}
                     totalPages={totalPages}
                     onPageSizeChange={setLimit}

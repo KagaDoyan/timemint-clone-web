@@ -25,7 +25,27 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
 import { toast } from "sonner";
-import DataTableDemo from '@/components/data-table-demo';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Department, Role } from '@/components/model';
+import { de } from 'date-fns/locale';
 
 interface Employee {
   id: number;
@@ -78,6 +98,8 @@ export default function EmployeePage({ session }: EmployeePageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
 
   const columns = useMemo<ColumnDef<Employee>[]>(() => [
     {
@@ -130,14 +152,89 @@ export default function EmployeePage({ session }: EmployeePageProps) {
         };
 
         return (
-          <ActionDropdown
-            onEdit={handleEdit}
-            onDelete={handleDeleteConfirmation}
-          />
+          <div>
+            <div className='hidden sm:block'>
+              <ActionDropdown
+                onEdit={handleEdit}
+                onDelete={handleDeleteConfirmation}
+              />
+            </div>
+            <div className='block sm:hidden'>
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <Button className='w-full'>Action</Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <div className="mx-auto w-full max-w-sm">
+                    <DrawerHeader>
+                      <div className='w-full flex justify-center items-center flex-col gap-2 p-4'>
+                        <Button className='w-full ' onClick={handleEdit}>Edit</Button>
+                        <Button className='w-full bg-destructive' onClick={handleDeleteConfirmation}>Delete</Button>
+                      </div>
+                    </DrawerHeader>
+                    <div className="p-4 pb-0">
+                      <div className="mt-3 gap-2">
+
+                      </div>
+                    </div>
+                    <DrawerFooter>
+                      <span className="text-muted-foreground text-center">Action</span>
+                    </DrawerFooter>
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </div>
+          </div>
         );
       },
+    },
+    {
+      accessorKey: 'card-header',
+      header: 'card-header',
+      cell: ({ row }) => {
+        const employee = row.original;
+        return employee.name;
+      }
     }
   ], []);
+
+  const fetchRole = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/roles/all?limit=100&page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.user.accessToken}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch roles');
+      }
+      const data = await res.json();
+      setRoles(data.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const fetchDepartment = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/departments/all?limit=100&page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.user.accessToken}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch departments');
+      }
+      const data = await res.json();
+      setDepartments(data.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const fetchData = async () => {
     try {
@@ -182,6 +279,11 @@ export default function EmployeePage({ session }: EmployeePageProps) {
     fetchData();
   }, [limit, page]);
 
+  useEffect(() => {
+    fetchDepartment();
+    fetchRole();
+  }, []);
+
   const handleSaveEmployee = async () => {
     try {
       if (!currentEmployee.name?.trim()) {
@@ -199,13 +301,14 @@ export default function EmployeePage({ session }: EmployeePageProps) {
           'Authorization': `Bearer ${session.user.accessToken}`,
         },
         body: JSON.stringify({
-          employee_id: currentEmployee.employee_no,
+          employee_no: currentEmployee.employee_no,
           name: currentEmployee.name.trim(),
           email: currentEmployee.email,
           phone: currentEmployee.phone,
           address: currentEmployee.address,
           position: currentEmployee.position,
           role_id: currentEmployee.role_id,
+          department_id: currentEmployee.department_id,
           ...(isEditing && { id: currentEmployee.id })
         })
       });
@@ -278,16 +381,15 @@ export default function EmployeePage({ session }: EmployeePageProps) {
         </Button>
       </div>
 
-      {/* <DataTable
+      <DataTable
         columns={columns}
         data={employees}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
         onPageSizeChange={setLimit}
-      /> */}
-
-      <DataTableDemo />
+      />
 
 
       <Dialog
@@ -306,22 +408,83 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               {isEditing ? 'Edit Employee' : 'Create Employee'}
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-6 py-4">
+            {[
+              { label: "Emp No.", value: currentEmployee.employee_no, key: "employee_no", placeholder: "Enter employee number" },
+              { label: "Fullname", value: currentEmployee.name, key: "name", placeholder: "Enter employee name" },
+              { label: "Email", value: currentEmployee.email, key: "email", placeholder: "Enter employee email" },
+              { label: "Phone", value: currentEmployee.phone, key: "phone", placeholder: "Enter employee phone" },
+              { label: "Job Title", value: currentEmployee.position, key: "position", placeholder: "Enter employee position" },
+            ].map(({ label, value, key, placeholder }) => (
+              <div className="grid grid-cols-4 items-center gap-4" key={key}>
+                <Label htmlFor={key} className="text-right">
+                  {label}
+                </Label>
+                <Input
+                  id={key}
+                  value={value || ""}
+                  onChange={(e) => setCurrentEmployee((prev) => ({ ...prev, [key]: e.target.value }))}
+                  className="col-span-3"
+                  placeholder={placeholder}
+                />
+              </div>
+            ))}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
+              <Label htmlFor="department_id" className="text-right">
+                Department
               </Label>
-              <Input
-                id="name"
-                value={currentEmployee.name || ''}
-                onChange={(e) =>
-                  setCurrentEmployee(prev => ({ ...prev, name: e.target.value }))
-                }
-                className="col-span-3"
-                placeholder="Enter employee name"
-              />
+              <div className="col-span-3">
+                <Select
+                  onValueChange={(value) =>
+                    setCurrentEmployee((prev) => ({ ...prev, department_id: Number(value) }))
+                  }
+                  defaultValue={currentEmployee.department_id?.toString()}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Departments</SelectLabel>
+                      {departments.map((department) => (
+                        <SelectItem key={department.id} value={department.id.toString()}>
+                          {department.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="role_id" className="text-right">
+                Role
+              </Label>
+              <div className="col-span-3">
+                <Select
+                  onValueChange={(value) =>
+                    setCurrentEmployee((prev) => ({ ...prev, role_id: parseInt(value) }))
+                  }
+                  defaultValue={currentEmployee.role_id?.toString()}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Roles</SelectLabel>
+                      {roles.map((role) => (
+                        <SelectItem key={role.id} value={role.id.toString()}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
+
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"

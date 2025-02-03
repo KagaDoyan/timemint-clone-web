@@ -247,6 +247,7 @@ export default function DepartmentManagement({ session }: DepartmentPageProps) {
         columns={columns}
         data={departments}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}

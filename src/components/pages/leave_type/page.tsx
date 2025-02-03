@@ -27,20 +27,13 @@ import { Plus } from 'lucide-react';
 import { toast } from "sonner";
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-
-interface Leave_type {
-  id: number;
-  leave_type: string;
-  description: string;
-  payable: boolean;
-  annually_max: number;
-}
+import { LeaveType } from '@/components/model';
 
 interface LeaveTypePaginationResponse {
   data: {
     limit: number;
     page: number;
-    data: Leave_type[];
+    data: LeaveType[];
     totalPages: number;
     totalRows: number;
   };
@@ -58,16 +51,16 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [leave_types, setLeave_types] = useState< Leave_type[]>([]);
+  const [leave_types, setLeave_types] = useState< LeaveType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentLeave_type, setCurrentLeave_type] = useState<Partial<Leave_type>>({});
+  const [currentLeave_type, setCurrentLeave_type] = useState<Partial<LeaveType>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [leave_typeToDelete, setLeave_typeToDelete] = useState<Leave_type | null>(null);
+  const [leave_typeToDelete, setLeave_typeToDelete] = useState<LeaveType | null>(null);
   const [leave_typeFilter, setLeave_typeFilter] = useState('');
 
-  const columns = useMemo<ColumnDef<Leave_type>[]>(() => [
+  const columns = useMemo<ColumnDef<LeaveType>[]>(() => [
     {
       accessorKey: 'id',
       header: 'ID',
@@ -271,6 +264,7 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
         columns={columns}
         data={leave_types}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}

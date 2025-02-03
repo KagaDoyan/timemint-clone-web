@@ -287,6 +287,7 @@ export default function HolidayManagement({ session }: holidayManagementProps) {
         columns={columns}
         data={holidays}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}

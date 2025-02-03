@@ -255,6 +255,7 @@ export default function DayOfWork({ session }: DayOfWorkPageProps) {
         columns={columns} 
         data={dayOfWorks} 
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
         onPageSizeChange={setLimit}

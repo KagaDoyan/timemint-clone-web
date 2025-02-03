@@ -265,6 +265,7 @@ export default function LocationManagement({ session }: LocationManagementProps)
         columns={columns}
         data={Locations}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}

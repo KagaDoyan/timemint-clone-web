@@ -247,6 +247,7 @@ export default function RoleManagement({ session }: RoleManagementProps) {
         columns={columns}
         data={roles}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}

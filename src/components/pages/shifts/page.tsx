@@ -27,28 +27,7 @@ import { Plus } from 'lucide-react';
 import { toast } from "sonner";
 import dayjs from 'dayjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import TimePicker from '@/components/ui/timepicker';
-
-
-interface Shift {
-  id: number
-  name: string
-  description: string
-  start_time: string
-  end_time: string
-  color: string
-  department_id: number
-  department: Department
-  created_at: string
-  updated_at: string
-}
-
-interface Department {
-  id: number
-  name: string
-  created_at: string
-  updated_at: string
-}
+import { Shift, Department } from '@/components/model';
 
 interface DepartmentPaginationResponse {
   data: {
@@ -336,6 +315,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         columns={columns}
         data={Shifts}
         pageSize={limit}
+        currentPage={page}
         totalPages={totalPages}
         onPageSizeChange={setLimit}
         onPageChange={setPage}
