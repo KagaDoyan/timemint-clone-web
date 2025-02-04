@@ -14,7 +14,10 @@ import {
     Home,
     Network,
     CalendarClock,
-    CalendarCheck
+    CalendarCheck,
+    NotepadText,
+    Archive,
+    CalendarX
 } from "lucide-react"
 
 export const navigationGroups = [
@@ -31,16 +34,10 @@ export const navigationGroups = [
                 icon: Home
             },
             {
-                title: "Dashboard",
-                href: "/dashboard",
-                roles: ["ADMIN", "MANAGER"],
-                icon: LayoutDashboard
-            },
-            {
                 title: "Leave",
                 href: "/leave",
                 roles: ["ADMIN", "MANAGER", "USER"],
-                icon: Calendar
+                icon: CalendarX
             },
             {
                 title: "Leave Approval",
@@ -58,7 +55,7 @@ export const navigationGroups = [
                 title: "Reports",
                 href: "/reports",
                 roles: ["ADMIN", "MANAGER"],
-                icon: CalendarCheck
+                icon: Archive
             },
         ]
     },
@@ -75,16 +72,10 @@ export const navigationGroups = [
                 icon: Users
             },
             {
-                title: "Holiday",
-                href: "/holiday",
+                title: "Events",
+                href: "/events",
                 roles: ["ADMIN"],
-                icon: TreePine
-            },
-            {
-                title: "Departments",
-                href: "/departments",
-                roles: ["ADMIN"],
-                icon: Network
+                icon: NotepadText
             },
             {
                 title: "Leave Type",

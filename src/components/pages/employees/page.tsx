@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
-import { toast } from "sonner";
 import {
   Drawer,
   DrawerClose,
@@ -45,29 +44,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Department, Role } from '@/components/model';
-import { de } from 'date-fns/locale';
+import { Employee } from '@/components/model';
+import { useToast } from '@/hooks/use-toast';
 
-interface Employee {
-  id: number;
-  employee_no: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  position: string;
-  role_id: number;
-  role: {
-    id: number;
-    name: string;
-  };
-  department_id: number;
-  department: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at: string;
-}
+
 
 interface EmployeePaginationResponse {
   data: {
@@ -86,6 +66,7 @@ interface EmployeePageProps {
 }
 
 export default function EmployeePage({ session }: EmployeePageProps) {
+  const { toast } = useToast()
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -123,7 +104,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       header: 'Address',
     },
     {
-      accessorKey: 'department.name',
+      accessorKey: 'department',
       header: 'Department',
     },
     {
@@ -280,14 +261,18 @@ export default function EmployeePage({ session }: EmployeePageProps) {
   }, [limit, page]);
 
   useEffect(() => {
-    fetchDepartment();
+    // fetchDepartment();
     fetchRole();
   }, []);
 
   const handleSaveEmployee = async () => {
     try {
       if (!currentEmployee.name?.trim()) {
-        toast.error("Employee name is required");
+        toast({
+          title: 'Error',
+          description: 'Employee name is required',
+          variant: 'destructive',
+        });
         return;
       }
 
@@ -308,7 +293,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
           address: currentEmployee.address,
           position: currentEmployee.position,
           role_id: currentEmployee.role_id,
-          department_id: currentEmployee.department_id,
+          department: currentEmployee.department,
           ...(isEditing && { id: currentEmployee.id })
         })
       });
@@ -321,17 +306,29 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Employee updated successfully" : "Employee created successfully");
+        toast({
+          title: 'Success',
+          description: isEditing ? 'Employee updated successfully' : 'Employee created successfully',
+          variant: 'default',
+        });
         fetchData();
         setIsDialogOpen(false);
         setCurrentEmployee({});
         setIsEditing(false);
       } else {
-        toast.error(result.error || "Operation failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Operation failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error saving employee:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 
@@ -353,16 +350,28 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Employee deleted successfully");
+        toast({
+          title: 'Success',
+          description: 'Employee deleted successfully',
+          variant: 'default',
+        });
         fetchData();
         setIsDeleteDialogOpen(false);
         setEmployeeToDelete(null);
       } else {
-        toast.error(result.error || "Deletion failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Deletion failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error deleting employee:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 
@@ -415,6 +424,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               { label: "Email", value: currentEmployee.email, key: "email", placeholder: "Enter employee email" },
               { label: "Phone", value: currentEmployee.phone, key: "phone", placeholder: "Enter employee phone" },
               { label: "Job Title", value: currentEmployee.position, key: "position", placeholder: "Enter employee position" },
+              { label: "Department", value: currentEmployee.department, key: "department", placeholder: "Enter employee department" },
             ].map(({ label, value, key, placeholder }) => (
               <div className="grid grid-cols-4 items-center gap-4" key={key}>
                 <Label htmlFor={key} className="text-right">
@@ -429,7 +439,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
                 />
               </div>
             ))}
-            <div className="grid grid-cols-4 items-center gap-4">
+            {/* <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="department_id" className="text-right">
                 Department
               </Label>
@@ -455,7 +465,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </div> */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role_id" className="text-right">
                 Role

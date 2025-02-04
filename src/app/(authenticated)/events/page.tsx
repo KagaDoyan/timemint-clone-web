@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/lib";
 import { redirect } from "next/navigation";
-import HolidayManagement from "@/components/pages/holiday/page";
+import EventManagement from "@/components/pages/events/page";
 
 export default async function Page() {
     const session = await getSession()
@@ -9,7 +9,7 @@ export default async function Page() {
     }
     return (
         <div>
-            <HolidayManagement session={session} />
+            <EventManagement session={session} />
         </div>
     );
 }

@@ -104,7 +104,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
       header: 'Employee',
       cell: ({ row }) => {
         const shift_assign = row.original;
-        return `${shift_assign.employee?.name} (${shift_assign.employee?.department.name})`;
+        return `${shift_assign.employee?.name} (${shift_assign.employee?.department})`;
       }
     },
     {
@@ -174,7 +174,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
           <div
             className={`inline-block px-2 py-1 text-sm rounded text-black text-opacity-80 text-center`}
           >
-            {shift_assign.employee?.name} {shift_assign.employee?.department.name}
+            {shift_assign.employee?.name} {shift_assign.employee?.department}
             <br />
             {shift_assign.shift?.name} {shift_assign.shift?.start_time} - {shift_assign.shift?.end_time}
             <br />
@@ -800,7 +800,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
                               //display employee name
                               const employee = employees?.find(e => e.id === cell)
                               return (
-                                <TableCell key={cell}>{employee?.name} ({employee?.department.name})</TableCell>
+                                <TableCell key={cell}>{employee?.name} ({employee?.department})</TableCell>
                               )
                             case "shift_id":
                               //display shift name and time 

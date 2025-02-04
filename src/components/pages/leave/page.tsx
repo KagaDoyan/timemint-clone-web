@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
 import { Calendar } from "@/components/ui/calendar"
 import {
     Popover,
@@ -22,6 +21,7 @@ import { Card } from '@/components/ui/card';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table';
 import { LeaveReqest } from '@/components/model';
+import { useToast } from '@/hooks/use-toast';
 
 interface LeavePageProps {
     session: any
@@ -63,6 +63,7 @@ type LeaveType = {
 }
 
 export default function LeavePage({ session }: LeavePageProps) {
+    const { toast } = useToast()
     const [formData, setFormData] = useState<Partial<LeaveReqestBody>>({})
     const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([])
     const [limit, setLimit] = useState(5);
@@ -70,6 +71,7 @@ export default function LeavePage({ session }: LeavePageProps) {
     const [totalPages, setTotalPages] = useState(0);
     const [totalRows, setTotalRows] = useState(0);
     const [leaverequests, setLeaverequests] = useState<LeaveReqest[]>([])
+    const [isAdminForm, setAdminForm] = useState(false)
 
     const columns = useMemo<ColumnDef<LeaveReqest>[]>(() => [
         {
@@ -154,11 +156,18 @@ export default function LeavePage({ session }: LeavePageProps) {
         })
         const data = await response.json()
         if (response.ok) {
-            toast.success(data.message)
+            toast({
+                title: 'Success',
+                description: "Leave request submitted successfully",
+            })
             setFormData({})
             fetchLeaverequests()
         } else {
-            toast.error(data.error || "Failed to submit leave request");
+            toast({
+                title: 'Error',
+                description: data.error || "Failed to submit leave request",
+                variant: "destructive",
+            })
         }
     }
 
@@ -173,7 +182,11 @@ export default function LeavePage({ session }: LeavePageProps) {
         if (response.ok) {
             setLeaveTypes(data.data.data)
         } else {
-            toast.error(data.error || "Failed to fetch leave types");
+            toast({
+                title: 'Error',
+                description: data.error || "Failed to fetch leave types",
+                variant: "destructive",
+            })
         }
     }
 
@@ -190,7 +203,11 @@ export default function LeavePage({ session }: LeavePageProps) {
             setTotalPages(data.data.totalPages)
             setTotalRows(data.data.totalRows)
         } else {
-            toast.error(data.error || "Failed to fetch leave requests");
+            toast({
+                title: 'Error',
+                description: data.error || "Failed to fetch leave requests",
+                variant: "destructive",
+            })
         }
     }
 
@@ -203,8 +220,25 @@ export default function LeavePage({ session }: LeavePageProps) {
         <div className="flex flex-col gap-4 p-4 max-w-full overflow-auto">
             <div className="grid auto-rows-min gap-4">
                 <Card className="rounded-xl bg-muted/30 p-6">
-                    <div className="grid gap-4 py-4">
-                        <h5 className="mb-4">Leave Request</h5>
+                    <div className={`grid gap-4 py-4`}>
+                        <div className={`grid grid-cols-1 sm:grid-cols-4 items-center gap-4 ${session?.user?.roles[0] === 'USER' && `hidden`}`}>
+                            <div className="flex items-center sm:col-span-3">
+                                <Switch
+                                    id="admin_form_switch"
+                                    checked={isAdminForm}
+                                    onCheckedChange={(checked) => setAdminForm(checked)}
+                                    className={cn(
+                                        "transition-colors",
+                                        isAdminForm ? "bg-blue-500" : "bg-gray-500"
+                                    )}
+                                    aria-label="Toggle Admin Form"
+                                />
+                                <span className="ml-2">
+                                    {isAdminForm ? "Admin Mode" : "User Mode"}
+                                </span>
+                            </div>
+                        </div>
+                        <h4>{isAdminForm ? "Admin Create Leave" : "Request Leave"}</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
                             <Label htmlFor="leave_type" className="text-right">
                                 Leave Type

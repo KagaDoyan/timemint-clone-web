@@ -5,8 +5,8 @@ export interface Shift {
     start_time: string
     end_time: string
     color: string
-    department_id: number
-    department: Department
+    // department_id: number
+    // department: Department
     created_at: string
     updated_at: string
 }
@@ -37,7 +37,7 @@ export interface Employee {
     role_id: number;
     role: Role;
     department_id: number;
-    department: Department;
+    department: string;
     created_at: string;
     updated_at: string;
 }
@@ -80,4 +80,20 @@ export interface LeaveType {
     description: string
     payable: boolean
     annually_max: number
+}
+
+/**
+ * Represents an event with details such as name, description,
+ * start date, and end date.
+ */
+export interface events {
+    id: number;
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    start: string
+    end: string
+    date: string
+    event_type: string
 }

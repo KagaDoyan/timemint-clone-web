@@ -24,10 +24,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
-import { toast } from "sonner";
 import dayjs from 'dayjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shift, Department } from '@/components/model';
+import { useToast } from '@/hooks/use-toast';
 
 interface DepartmentPaginationResponse {
   data: {
@@ -58,6 +58,7 @@ interface ShiftPageProps {
 }
 
 export default function ShiftManagement({ session }: ShiftPageProps) {
+  const {toast} = useToast()
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -92,14 +93,6 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       cell: ({ row }) => {
         const { start_time, end_time } = row.original;
         return `${start_time} - ${end_time}`;
-      }
-    },
-    {
-      accessorKey: 'department',
-      header: 'Department',
-      cell: ({ row }) => {
-        const { department } = row.original;
-        return department?.name || 'N/A';
       }
     },
     {
@@ -190,7 +183,11 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         setTotalRows(result.data.totalRows);
         setCurrentPage(result.data.page);
       } else {
-        toast.error(result.error || "Failed to fetch roles");
+        toast({
+          title: 'Error',
+          description: result.error || "Failed to fetch roles",
+          variant: 'destructive',
+        });
         setShifts([]);
         setTotalPages(0);
         setTotalRows(0);
@@ -198,7 +195,11 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       }
     } catch (error) {
       console.error('Error fetching roles:', error);
-      toast.error("Network error occurred");
+      toast({
+        title: 'Error',
+        description: "Network error occurred",
+        variant: 'destructive',
+      });
       setShifts([]);
       setTotalPages(0);
       setTotalRows(0);
@@ -210,14 +211,18 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
 
   useEffect(() => {
     fetchShifts(limit, page, nameFilter);
-    fetchDepartments();
+    // fetchDepartments();
   }, [limit, page, nameFilter]);
 
   // Create or update role
   const handleSaveShift = async () => {
     try {
       if (!currentShift.name?.trim()) {
-        toast.error("Shift name is required");
+        toast({
+          title: 'Error',
+          description: "Shift name is required",
+          variant: 'destructive',
+        });
         return;
       }
 
@@ -234,7 +239,6 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
           name: currentShift.name.trim(),
           description: currentShift.description?.trim() || '',
           color: currentShift.color,
-          department_id: currentShift.department_id,
           start_time: currentShift.start_time,
           end_time: currentShift.end_time,
           ...(isEditing && { id: currentShift.id })
@@ -249,17 +253,28 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Role updated successfully" : "Role created successfully");
+        toast({
+          title: isEditing ? "Shift updated successfully" : "Shift created successfully",
+          variant: 'default',
+        });
         fetchShifts(limit, page, nameFilter);
         setIsDialogOpen(false);
         setCurrentShift({});
         setIsEditing(false);
       } else {
-        toast.error(result.error || "Operation failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Operation failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error saving role:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 
@@ -282,16 +297,27 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Role deleted successfully");
+        toast({
+          title: "Shift deleted successfully",
+          variant: 'default',
+        });
         fetchShifts(limit, page, nameFilter);
         setIsDeleteDialogOpen(false);
         setShiftToDelete(null);
       } else {
-        toast.error(result.error || "Deletion failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Deletion failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error deleting role:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 
@@ -394,7 +420,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
                 placeholder="00:00"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            {/* <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="department" className="text-right">
                 Department
               </Label>
@@ -415,7 +441,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="color" className="text-right">
                 Color

@@ -24,10 +24,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
-import { toast } from "sonner";
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { LeaveType } from '@/components/model';
+import { useToast } from '@/hooks/use-toast';
 
 interface LeaveTypePaginationResponse {
   data: {
@@ -46,6 +46,7 @@ interface Leave_typeManagementProps {
 }
 
 export default function LeavetypeManagement({ session }: Leave_typeManagementProps) {
+  const {toast} = useToast()
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -142,7 +143,11 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
         setTotalRows(result.data.totalRows);
         setCurrentPage(result.data.page);
       } else {
-        toast.error(result.error || "Failed to fetch leave types");
+        toast({
+          title: 'Error',
+          description: result.error || "Failed to fetch leave types",
+          variant: "destructive",
+        });
         setLeave_types([]);
         setTotalPages(0);
         setTotalRows(0);
@@ -150,7 +155,11 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
       }
     } catch (error) {
       console.error('Error fetching leave types:', error);
-      toast.error("Network error occurred");
+      toast({
+        title: 'Error',
+        description: "Network error occurred",
+        variant: "destructive",
+      });
       setLeave_types([]);
       setTotalPages(0);
       setTotalRows(0);
@@ -168,7 +177,11 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
   const handleSaveLeave_type = async () => {
     try {
       if (!currentLeave_type.leave_type?.trim()) {
-        toast.error("Leave type name is required");
+        toast({
+          title: 'Error',
+          description: "Leave type name is required",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -198,17 +211,29 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
       const result = await response.json();
 
       if (result.status) {
-        toast.success(isEditing ? "Leave type updated successfully" : "Leave type created successfully");
+        toast({
+          title: 'Success',
+          description: isEditing ? "Leave type updated successfully" : "Leave type created successfully",
+          variant: 'default',
+        });
         fetchLeave_types(limit, page);
         setIsDialogOpen(false);
         setCurrentLeave_type({});
         setIsEditing(false);
       } else {
-        toast.error(result.error || "Operation failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Operation failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error saving leave type:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 
@@ -231,16 +256,28 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
       const result = await response.json();
 
       if (result.status) {
-        toast.success("Leave type deleted successfully");
+        toast({
+          title: 'Success',
+          description: "Leave type deleted successfully",
+          variant: 'default',
+        });
         fetchLeave_types(limit, page);
         setIsDeleteDialogOpen(false);
         setLeave_typeToDelete(null);
       } else {
-        toast.error(result.error || "Deletion failed");
+        toast({
+          title: 'Error',
+          description: result.error || "Deletion failed",
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error deleting leave type:', error);
-      toast.error(error instanceof Error ? error.message : "Network error occurred");
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : "Network error occurred",
+        variant: 'destructive',
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import DepartmentManagement from "@/components/pages/department/page";
+import ReportPage from "@/components/pages/reports/page";
 import { getSession } from "@/lib/lib";
 import { redirect } from "next/navigation";
 
@@ -9,7 +9,7 @@ export default async function Page() {
     }
     return (
         <div>
-            <DepartmentManagement session={session} />
+            <ReportPage session={session} />
         </div>
-    );
+    )
 }

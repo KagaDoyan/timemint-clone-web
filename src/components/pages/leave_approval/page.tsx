@@ -61,7 +61,9 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
     const [employee, setEmployee] = useState<Employee[]>([]);
     const [empFilter, setEmpFilter] = useState<number | null>(null);
     const [openEmployee, setOpenEmployee] = useState(false);
+    const [approveDialogOpen, setApproveDialogOpen] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    
     const [rejectionRemark, setRejectionRemark] = useState('');
     const colomns = useMemo<ColumnDef<LeaveReqest>[]>(() => [
         {
@@ -76,7 +78,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                 return (
                     <div className="flex items-center">
                         <div className="mr-2">{employee?.name}</div>
-                        <div className="mr-2">({employee?.department.name})</div>
+                        <div className="mr-2">({employee?.department})</div>
                     </div>
                 );
             },
@@ -244,12 +246,34 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
 
     const handleApprove = async () => {
         // Implement the logic for approving the leave request
-        toast({
-            title: "Leave Request Approved",
-            description: "The leave request has been approved.",
-            variant: "default",
-        });
-        setIsDialogOpen(false);
+        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/${currentdata.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.user.accessToken}`,
+            },
+            body: JSON.stringify({
+                leave_request_id: currentdata.id,
+                status: 'approved',
+                remark: '',
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                toast({
+                    title: "Leave Request Approved",
+                    description: "The leave request has been approved.",
+                    variant: "default",
+                });
+                setIsDialogOpen(false);
+                fetchData();
+        }).catch(error => {
+            toast({
+                title: "Error",
+                description: "Failed to approve leave request",
+                variant: "destructive",
+            });
+        })
     };
 
     const handleReject = async () => {
@@ -343,7 +367,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                                                 setOpenEmployee(false)
                                             }}
                                         >
-                                            {employee.employee_no} {employee.name} ({employee.department.name})
+                                            {employee.employee_no} {employee.name} ({employee.department})
                                             <Check
                                                 className={cn(
                                                     "ml-auto",
@@ -482,6 +506,37 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            
+            <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action can not be revert!.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="flex space-x-4">
+                        <Textarea
+                            value={rejectionRemark}
+                            onChange={(e) => setRejectionRemark(e.target.value)}
+                            placeholder="Enter reason for rejection"
+                            rows={4}
+                        />
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => (handleApprove)}
+                            disabled={rejectionRemark === ""}
+                        >
+                            Approve
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     );
 }
