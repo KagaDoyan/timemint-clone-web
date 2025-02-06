@@ -12,8 +12,6 @@ import {
   subMonths,
   isToday,
   subDays,
-  parseISO,
-  getMinutes,
   isWithinInterval,
   parse,
   subWeeks,
@@ -608,7 +606,7 @@ const HomePage = ({ session }: HomepageProp) => {
                       <span>{leave.leave_type.leave_type}</span>
                     </div>
                     <div className="text-sm text-gray-600">
-                      <p>Date: {dayjs(leave.start_date).format("DD-MM-YYYY")} - {dayjs(leave.end_date).format("DD-MM-YYYY")}</p>
+                      <p>Date: {format(parse(leave.start_date, 'dd-MM-yyyy', new Date()), "dd/MM/yyyy")} - {format(parse(leave.end_date, 'dd-MM-yyyy', new Date()), "dd/MM/yyyy")}</p>
                       <p>Reason: {leave.reason}</p>
                     </div>
                   </div>

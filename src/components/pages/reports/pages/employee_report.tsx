@@ -37,7 +37,7 @@ const EmployeeReportPage: React.FC<EmployeeReportPageProps> = ({ session }) => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-    const filtered = employees.filter((employee) =>
+    const filtered = employees?.filter((employee) =>
       employee.name.toLowerCase().includes(query) ||
       employee.employee_no.toLowerCase().includes(query) ||
       employee.email.toLowerCase().includes(query) ||
@@ -49,7 +49,7 @@ const EmployeeReportPage: React.FC<EmployeeReportPageProps> = ({ session }) => {
   };
 
   const handleExport = () => {
-    const worksheetData = filteredEmployees.map((employee) => ({
+    const worksheetData = filteredEmployees?.map((employee) => ({
       "Employee No": employee.employee_no,
       Name: employee.name,
       Email: employee.email,
@@ -112,7 +112,7 @@ const EmployeeReportPage: React.FC<EmployeeReportPageProps> = ({ session }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.map((employee) => (
+              {filteredEmployees?.map((employee) => (
                 <tr key={employee.id} className="border-t">
                   <td className="px-4 py-2">{employee.id}</td>
                   <td className="px-4 py-2">{employee.employee_no}</td>

@@ -327,6 +327,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
               date: row[headers.indexOf("date")],
               employee: null,
               shift: null,
+              created_by_user: null
             };
             return rowObject;
           })

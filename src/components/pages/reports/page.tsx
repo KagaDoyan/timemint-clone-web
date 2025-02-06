@@ -1,6 +1,9 @@
 'use client';
 import React, { useState } from "react";
 import EmployeeReportPage from "./pages/employee_report";
+import ShiftReportPage from "./pages/shift_report";
+import ShiftAssignmentReportPage from "./pages/shift_assignment";
+import LeaveReportPage from "./pages/leave_report";
 
 interface ReportPageProps {
     session: any
@@ -10,18 +13,9 @@ const ReportPage: React.FC<ReportPageProps> = ({ session }) => {
 
     const tabs = ["Leaves", "Assigned Shifts", "Shifts", "Employees"];
     const reportContent = [
-        <div>
-            <h2 className="text-xl font-bold"></h2>
-            <p>This section contains a summary of the overall performance.</p>
-        </div>,
-        <div>
-            <h2 className="text-xl font-bold">Sales Report</h2>
-            <p>Here you can see detailed sales data and trends.</p>
-        </div>,
-        <div>
-            <h2 className="text-xl font-bold">Customer Report</h2>
-            <p>Insights and statistics about customer behavior.</p>
-        </div>,
+        <LeaveReportPage session={session} />,
+        <ShiftAssignmentReportPage session={session} />,
+        <ShiftReportPage session={session} />,
         <EmployeeReportPage session={session} />,
     ];
 

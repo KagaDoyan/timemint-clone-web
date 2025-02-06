@@ -54,6 +54,7 @@ export interface ShiftAssign {
     shift_id: number;
     shift: Shift | null;
     date: string;
+    created_by_user: Employee | null;
 }
 
 export interface LeaveReqest {

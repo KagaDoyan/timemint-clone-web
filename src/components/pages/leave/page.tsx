@@ -9,30 +9,27 @@ import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
 import { cn } from '@/lib/utils';
-import { Calendar1 } from 'lucide-react';
+import { Calendar1, Check, ChevronDown } from 'lucide-react';
 import dayjs from 'dayjs';
 import { Card } from '@/components/ui/card';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table';
 import { LeaveReqest } from '@/components/model';
 import { useToast } from '@/hooks/use-toast';
+import { Employee } from '@/components/model';
 
 interface LeavePageProps {
     session: any
-}
-
-
-
-export interface Employee {
-    id: number
-    employee_no: string
-    name: string
 }
 
 interface LeaveReqestBody {
@@ -65,6 +62,7 @@ type LeaveType = {
 export default function LeavePage({ session }: LeavePageProps) {
     const { toast } = useToast()
     const [formData, setFormData] = useState<Partial<LeaveReqestBody>>({})
+    const [employee, setEmployee] = useState<Employee[]>([])
     const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([])
     const [limit, setLimit] = useState(5);
     const [page, setPage] = useState(1);
@@ -72,6 +70,8 @@ export default function LeavePage({ session }: LeavePageProps) {
     const [totalRows, setTotalRows] = useState(0);
     const [leaverequests, setLeaverequests] = useState<LeaveReqest[]>([])
     const [isAdminForm, setAdminForm] = useState(false)
+    const [openEmployee, setOpenEmployee] = useState(false);
+    const [empFilter, setEmpFilter] = useState<number | null>(null);
 
     const columns = useMemo<ColumnDef<LeaveReqest>[]>(() => [
         {
@@ -137,35 +137,112 @@ export default function LeavePage({ session }: LeavePageProps) {
                 );
             },
         },
+        {
+            accessorKey: 'status',
+            header: 'card-header',
+            cell: ({ row }) => {
+                const leave_request = row.original;
+                const colorClass =
+                    leave_request.status === 'approved'
+                        ? 'bg-green-500 text-white'
+                        : leave_request.status === 'rejected'
+                            ? 'bg-red-500 text-white'
+                            : 'bg-yellow-500 text-black';
+
+                return (
+                    <div className=" p-2 space-y-1 gap-4">
+                        <div className="text-lg">{leave_request.employee.name} | {leave_request.leave_type.leave_type}</div>
+                        <div className="text-sm text-gray-600">Leave Date: {leave_request.start_date} - {leave_request.end_date}</div>
+                        <div
+                            className={`py-1 px-3 rounded-full text-center ${colorClass}`}
+                        >
+                            {leave_request.status}
+                        </div>
+                    </div>
+                )
+            }
+        }
     ], [])
 
     const HandleSubmit = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/request`, {
-            method: 'POST',
+        if (!isAdminForm) {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/request`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.user.accessToken}`,
+                },
+                body: JSON.stringify({
+                    leave_type_id: formData.leave_type_id,
+                    start_date: dayjs(formData.start_date).format('DD-MM-YYYY'),
+                    end_date: dayjs(formData.end_date).format('DD-MM-YYYY'),
+                    reason: formData.reason,
+                    full_day: formData.full_day,
+                })
+            })
+            const data = await response.json()
+            if (response.ok) {
+                toast({
+                    title: 'Success',
+                    description: "Leave request submitted successfully",
+                })
+                setFormData({})
+                fetchLeaverequests()
+            } else {
+                toast({
+                    title: 'Error',
+                    description: data.error || "Failed to submit leave request",
+                    variant: "destructive",
+                })
+            }
+        } else {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.user.accessToken}`,
+                },
+                body: JSON.stringify({
+                    leave_type_id: formData.leave_type_id,
+                    start_date: dayjs(formData.start_date).format('DD-MM-YYYY'),
+                    end_date: dayjs(formData.end_date).format('DD-MM-YYYY'),
+                    reason: formData.reason,
+                    full_day: formData.full_day,
+                    employee_id: formData.employee_id
+                })
+            })
+            const data = await response.json()
+            if (response.ok) {
+                toast({
+                    title: 'Success',
+                    description: "Leave request submitted successfully",
+                })
+                setFormData({})
+                fetchLeaverequests()
+            } else {
+                toast({
+                    title: 'Error',
+                    description: data.error || "Failed to submit leave request",
+                    variant: "destructive",
+                })
+            }
+        }
+    }
+
+    const fetchEmployees = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/options`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.user.accessToken}`,
-            },
-            body: JSON.stringify({
-                leave_type_id: formData.leave_type_id,
-                start_date: dayjs(formData.start_date).format('DD-MM-YYYY'),
-                end_date: dayjs(formData.end_date).format('DD-MM-YYYY'),
-                reason: formData.reason,
-                full_day: formData.full_day,
-            })
+            }
         })
         const data = await response.json()
         if (response.ok) {
-            toast({
-                title: 'Success',
-                description: "Leave request submitted successfully",
-            })
-            setFormData({})
-            fetchLeaverequests()
+            setEmployee(data.data)
         } else {
             toast({
                 title: 'Error',
-                description: data.error || "Failed to submit leave request",
+                description: data.error || "Failed to fetch employees",
                 variant: "destructive",
             })
         }
@@ -191,7 +268,7 @@ export default function LeavePage({ session }: LeavePageProps) {
     }
 
     const fetchLeaverequests = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/all?limit=${limit}&page=${page}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/leave-requests/all?limit=${limit}&page=${page}${!isAdminForm ? `&empID=${session.user.id}` : ''}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.user.accessToken}`,
@@ -214,7 +291,12 @@ export default function LeavePage({ session }: LeavePageProps) {
     useEffect(() => {
         fetchLeaverequests()
         fetchLeaveTypes()
+        fetchEmployees()
     }, [])
+
+    useEffect(() => {
+        fetchLeaverequests()
+    }, [page, limit, isAdminForm])
 
     return (
         <div className="flex flex-col gap-4 p-4 max-w-full overflow-auto">
@@ -239,6 +321,50 @@ export default function LeavePage({ session }: LeavePageProps) {
                             </div>
                         </div>
                         <h4>{isAdminForm ? "Admin Create Leave" : "Request Leave"}</h4>
+                        <div className={`grid grid-cols-1 sm:grid-cols-4 items-center gap-4 ${!isAdminForm ? 'hidden' : 'block'}`}>
+                            <Label htmlFor="employee" className="text-right">Employee</Label>
+                            <Popover open={openEmployee} onOpenChange={setOpenEmployee}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-between"
+                                    >
+                                        {formData.employee_id
+                                            ? employee.find((e) => e.id === formData.employee_id)?.name || "Select an Employee"
+                                            : "Select an Employee"}
+                                        <ChevronDown className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-2">
+                                    <Command>
+                                        <CommandInput placeholder="Search employee..." />
+                                        <CommandList>
+                                            <CommandEmpty>No employees found</CommandEmpty>
+                                            <CommandGroup>
+                                                {employee.map((emp) => (
+                                                    <CommandItem
+                                                        key={emp.id}
+                                                        onSelect={() => {
+                                                            setFormData((prev) => ({
+                                                                ...prev,
+                                                                employee_id: emp.id,
+                                                            }));
+                                                            setOpenEmployee(false); // Close popover after selection
+                                                        }}
+                                                    >
+                                                        {emp.name}
+                                                        {formData.employee_id === emp.id && (
+                                                            <Check className="ml-auto h-4 w-4 text-green-500" />
+                                                        )}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
                             <Label htmlFor="leave_type" className="text-right">
                                 Leave Type
@@ -247,7 +373,7 @@ export default function LeavePage({ session }: LeavePageProps) {
                                 onValueChange={value => {
                                     setFormData(prev => ({ ...prev, leave_type_id: Number(value) }))
                                 }}
-                                defaultValue={formData.leave_type_id?.toString() || ''}
+                                value={formData.leave_type_id?.toString() || ''}
                             >
                                 <SelectTrigger className="sm:col-span-3">
                                     <SelectValue placeholder="Select a leave type" />
@@ -328,7 +454,7 @@ export default function LeavePage({ session }: LeavePageProps) {
                             <Label htmlFor="full_day" className="text-right">Full Day</Label>
                             <Switch
                                 id="full_day"
-                                checked={formData.full_day}
+                                checked={formData.full_day ? true : false}
                                 onCheckedChange={(checked) =>
                                     setFormData(prev => ({ ...prev, full_day: checked }))
                                 }
