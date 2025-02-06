@@ -1,6 +1,5 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 const secretKey = "secret";

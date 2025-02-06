@@ -24,8 +24,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
-import dayjs from 'dayjs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shift, Department } from '@/components/model';
 import { useToast } from '@/hooks/use-toast';
 import { TimePicker } from '@/components/ui/timepicker';

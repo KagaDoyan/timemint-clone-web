@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
       algorithms: ['HS256']
     });
     return NextResponse.next();
-  } catch (error) {
+  } catch {
     // Invalid token, redirect to login
     return NextResponse.redirect(new URL('/login', request.url));
   }
