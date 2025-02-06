@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shift, Department } from '@/components/model';
 import { useToast } from '@/hooks/use-toast';
+import { TimePicker } from '@/components/ui/timepicker';
 
 interface DepartmentPaginationResponse {
   data: {
@@ -396,28 +397,22 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
               <Label htmlFor="start_time" className="text-right">
                 Start Time
               </Label>
-              <Input
-                id="start_time"
-                value={currentShift.start_time || ''}
-                onChange={(e) =>
-                  setCurrentShift(prev => ({ ...prev, start_time: e.target.value }))
-                }
+              <TimePicker
+                value={currentShift.start_time}
+                onChange={(time: string) => setCurrentShift(prev => ({ ...prev, start_time: time }))}
+                placeholder='HH:mm'
                 className="col-span-3"
-                placeholder="00:00"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="end_time" className="text-right">
                 End Time
               </Label>
-              <Input
-                id="end_time"
+              <TimePicker
                 value={currentShift.end_time || ''}
-                onChange={(e) =>
-                  setCurrentShift(prev => ({ ...prev, end_time: e.target.value }))
-                }
+                onChange={(time: string) => setCurrentShift(prev => ({ ...prev, end_time: time }))}
                 className="col-span-3"
-                placeholder="00:00"
+                placeholder='HH:mm'
               />
             </div>
             {/* <div className="grid grid-cols-4 items-center gap-4">

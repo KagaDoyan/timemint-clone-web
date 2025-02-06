@@ -9,10 +9,10 @@ export async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')?.value;
 
   // Public routes that don't require authentication
-  const publicPaths = ['/login'];
+  const publicPaths = ['/login', '/set-password'];
 
   // Check if the current path is public
-  const isPublicPath = publicPaths.some(path => 
+  const isPublicPath = publicPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );
 

@@ -1,10 +1,11 @@
+
 import { redirect } from "next/navigation";
 import { getSession, login } from "@/lib/lib";
 import { Button } from "@/components/ui/button";
 
 export default async function LoginPage() {
   const session = await getSession();
-  
+
   // If already logged in, redirect to dashboard
   if (session) {
     redirect("/home");
@@ -17,8 +18,14 @@ export default async function LoginPage() {
         <form
           action={async (formData) => {
             "use server";
-            await login(formData);
-            redirect("/home");
+            try {
+              await login(formData);
+              redirect("/home");
+            } catch (error) {
+              if (error == "Error: set password") {
+                redirect(`/set-password`);
+              }
+            }
           }}
           className="space-y-4"
         >

@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils"
 import dayjs from 'dayjs';
 import { events } from '@/components/model';
 import { useToast } from '@/hooks/use-toast';
+import { TimePicker } from '@/components/ui/timepicker';
 
 
 interface EventPaginationResponse {
@@ -406,7 +407,7 @@ export default function EventManagement({ session }: eventManagementProps) {
               <Label htmlFor="start" className="text-right">
                 Start
               </Label>
-              <Input
+              {/* <Input
                 id="start"
                 value={currentevent.start || ''}
                 onChange={(e) =>
@@ -414,13 +415,19 @@ export default function EventManagement({ session }: eventManagementProps) {
                 }
                 className="col-span-3"
                 placeholder="Enter Event name"
+              /> */}
+              <TimePicker
+                value={currentevent.start}
+                onChange={time => setCurrentEvent(prev => ({ ...prev, start: time }))}
+                placeholder='HH:mm'
+                className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="end" className="text-right">
                 End
               </Label>
-              <Input
+              {/* <Input
                 id="end"
                 value={currentevent.end || ''}
                 onChange={(e) =>
@@ -428,6 +435,12 @@ export default function EventManagement({ session }: eventManagementProps) {
                 }
                 className="col-span-3"
                 placeholder="Enter Event name"
+              /> */}
+              <TimePicker
+                value={currentevent.end}
+                onChange={time => setCurrentEvent(prev => ({ ...prev, end: time }))}
+                placeholder='HH:mm'
+                className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

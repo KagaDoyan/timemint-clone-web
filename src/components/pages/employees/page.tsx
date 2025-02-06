@@ -100,10 +100,6 @@ export default function EmployeePage({ session }: EmployeePageProps) {
       header: 'Phone',
     },
     {
-      accessorKey: 'address',
-      header: 'Address',
-    },
-    {
       accessorKey: 'department',
       header: 'Department',
     },
