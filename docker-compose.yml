@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  app-dev:
+  att-dev:
     image: att-dev:latest  # Use the dev image for development
     container_name: docker-next-dev
     ports:
