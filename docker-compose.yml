@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   app-dev:
-    image: web-dev:latest  # Use the dev image for development
+    image: att-dev:latest  # Use the dev image for development
     container_name: docker-next-dev
     ports:
       - '4001:80'           # Map port 8080 on host to port 80 in container
