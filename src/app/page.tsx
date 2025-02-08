@@ -5,7 +5,7 @@ export default async function HomePage() {
   // Check if user is authenticated
   const authenticated = await isAuthenticated();
   if (authenticated) {
-    redirect("/dashboard");
+    redirect("/home");
   }
 
   // If not authenticated, redirect to login

@@ -245,7 +245,7 @@ export default function RoleManagement({ session }: RoleManagementProps) {
 
       <DataTable
         columns={columns}
-        data={roles}
+        data={roles || []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}

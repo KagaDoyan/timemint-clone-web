@@ -81,7 +81,7 @@ export function DataTable<TData, TValue>({
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
             className="border rounded p-1 text-sm"
           >
-            {[5, 10, 20, 50].map(size => (
+            {[5, 10, 20, 50]?.map(size => (
               <option key={size} value={size}>{size}</option>
             ))}
           </select>
@@ -111,7 +111,7 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {headers.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers?.map((header) => {
                   if (header.column.columnDef.header === "card-header") return null;
                   return (
                     <TableHead key={header.id} className="whitespace-nowrap">
@@ -129,12 +129,12 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {rows?.length ? (
-              rows.map((row) => (
+              rows?.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => {
+                  {row?.getVisibleCells()?.map((cell) => {
                     if (cell.column.columnDef.header === "card-header") {
                       return null
                     }
@@ -158,7 +158,7 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="block sm:hidden">
         {rows?.length ? (
-          rows.map((row) => {
+          rows?.map((row) => {
             const isExpanded = expandedRows[row.id] ?? false;
 
             return (
@@ -198,7 +198,7 @@ export function DataTable<TData, TValue>({
                 {isExpanded && (
                   <CardContent>
                     <ul className="space-y-2">
-                      {row.getVisibleCells().map((cell) => {
+                      {row.getVisibleCells()?.map((cell) => {
                         const header = cell.column.columnDef.header?.toString()
                         if (header == "card-header") {
                           return (

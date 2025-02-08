@@ -358,7 +358,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                             <CommandList>
                                 <CommandEmpty>No employee found.</CommandEmpty>
                                 <CommandGroup>
-                                    {employee.map((employee) => (
+                                    {employee?.map((employee) => (
                                         <CommandItem
                                             key={employee.id}
                                             value={employee.id.toString()}
@@ -390,7 +390,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                         { key: "Pending", icon: <Clock className="text-yellow-500 w-6 h-6" />, label: "Pending", count: pending },
                         { key: "Approved", icon: <Check className="text-green-500 w-6 h-6" />, label: "Approved", count: approved },
                         { key: "Rejected", icon: <X className="text-red-500 w-6 h-6" />, label: "Rejected", count: rejected },
-                    ].map(({ key, icon, label, count }) => (
+                    ]?.map(({ key, icon, label, count }) => (
                         <button
                             key={key}
                             className="flex items-center justify-between p-4 shadow-lg rounded-lg bg-white border border-gray-200 hover:bg-gray-50 focus:outline-none"
@@ -409,7 +409,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                 <div className="flex-grow bg-white shadow-md rounded-lg p-4">
                     <h2 className="text-lg font-semibold mb-4">Leave Approval ({statusFilter || "All"})</h2>
                     <DataTable
-                        data={data}
+                        data={data || []}
                         columns={colomns}
                         pageSize={limit}
                         totalPages={totalPages}

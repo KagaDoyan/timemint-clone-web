@@ -125,7 +125,7 @@ export default function CalendarUI({ date, setSelectedDay }: CalendarProps) {
                 <div>S</div>
             </div>
             <div className="grid grid-cols-7 mt-2 text-sm">
-                {days.map((day, dayIdx) => (
+                {days?.map((day, dayIdx) => (
                     <div
                         key={day.toString()}
                         className={classNames(

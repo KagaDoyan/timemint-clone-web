@@ -338,7 +338,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
 
       <DataTable
         columns={columns}
-        data={Shifts}
+        data={Shifts || []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}

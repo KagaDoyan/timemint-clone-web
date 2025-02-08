@@ -61,7 +61,7 @@ export function DrawerMenu({
 
   // Filter navigation items based on user roles
   const filteredNavigation = navigationGroups
-    .map(group => ({
+    ?.map(group => ({
       ...group,
       items: group.items.filter(item =>
         item.roles.some(role => userRoles.includes(role))
@@ -89,13 +89,13 @@ export function DrawerMenu({
 
           <div className="p-4 pb-0">
             {/* Navigation items moved here */}
-            {filteredNavigation.map((group) => (
+            {filteredNavigation?.map((group) => (
               <div key={group.group.name}>
                 <div className="text-xs text-muted-foreground uppercase px-4 py-2">
                   {group.group.name}
                 </div>
                 <div>
-                  {group.items.map((item) => (
+                  {group.items?.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}

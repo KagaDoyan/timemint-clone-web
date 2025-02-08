@@ -77,7 +77,7 @@ export function AppSidebar({
 
   // Filter navigation items based on user roles
   const filteredNavigation = navigationGroups
-    .map(group => ({
+    ?.map(group => ({
       ...group,
       items: group.items.filter(item =>
         item.roles.some(role => userRoles.includes(role))
@@ -103,13 +103,13 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        {filteredNavigation.map((group) => (
+        {filteredNavigation?.map((group) => (
           <SidebarGroup key={group.group.name}>
             <div className="text-xs text-muted-foreground uppercase px-4 py-2">
               {group.group.name}
             </div>
             <SidebarMenu>
-              {group.items.map((item) => (
+              {group.items?.map((item) => (
                 <SidebarMenuButton
                   key={item.href}
                   asChild

@@ -22,7 +22,7 @@ export function SideNav({ className, items, ...props }: SideNavProps) {
       )}
       {...props}
     >
-      {items.map((item) => (
+      {items?.map((item) => (
         <Link
           key={item.href}
           href={item.href}

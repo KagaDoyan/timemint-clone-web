@@ -26,7 +26,7 @@ const ReportPage: React.FC<ReportPageProps> = ({ session }) => {
             </div>
             {/* Tabs */}
             <div className="flex border-b border-gray-300 mb-4">
-                {tabs.map((tab, index) => (
+                {tabs?.map((tab, index) => (
                     <button
                         key={index}
                         className={`flex-1 text-center py-2 px-4 cursor-pointer ${activeTab === index

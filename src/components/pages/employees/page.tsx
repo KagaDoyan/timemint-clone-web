@@ -388,7 +388,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
 
       <DataTable
         columns={columns}
-        data={employees}
+        data={employees ? employees : []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}
@@ -421,7 +421,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
               { label: "Phone", value: currentEmployee.phone, key: "phone", placeholder: "Enter employee phone" },
               { label: "Job Title", value: currentEmployee.position, key: "position", placeholder: "Enter employee position" },
               { label: "Department", value: currentEmployee.department, key: "department", placeholder: "Enter employee department" },
-            ].map(({ label, value, key, placeholder }) => (
+            ]?.map(({ label, value, key, placeholder }) => (
               <div className="grid grid-cols-4 items-center gap-4" key={key}>
                 <Label htmlFor={key} className="text-right">
                   {label}
@@ -479,7 +479,7 @@ export default function EmployeePage({ session }: EmployeePageProps) {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Roles</SelectLabel>
-                      {roles.map((role) => (
+                      {roles?.map((role) => (
                         <SelectItem key={role.id} value={role.id.toString()}>
                           {role.name}
                         </SelectItem>

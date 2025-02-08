@@ -341,7 +341,7 @@ export default function LeavePage({ session }: LeavePageProps) {
                                         <CommandList>
                                             <CommandEmpty>No employees found</CommandEmpty>
                                             <CommandGroup>
-                                                {employee.map((emp) => (
+                                                {employee?.map((emp) => (
                                                     <CommandItem
                                                         key={emp.id}
                                                         onSelect={() => {
@@ -379,7 +379,7 @@ export default function LeavePage({ session }: LeavePageProps) {
                                     <SelectValue placeholder="Select a leave type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {leaveTypes.map(leaveType => (
+                                    {leaveTypes?.map(leaveType => (
                                         <SelectItem key={leaveType.id} value={leaveType.id.toString()}>
                                             {leaveType.leave_type}
                                         </SelectItem>
@@ -472,7 +472,7 @@ export default function LeavePage({ session }: LeavePageProps) {
             <div className="flex-1 rounded-xl bg-muted/50 p-4 max-w-full overflow-auto">
                 <DataTable
                     columns={columns}
-                    data={leaverequests}
+                    data={leaverequests || []}
                     currentPage={page}
                     pageSize={limit}
                     totalPages={totalPages}

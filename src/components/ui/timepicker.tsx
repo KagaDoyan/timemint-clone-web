@@ -64,7 +64,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
           <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
             <ScrollArea className="w-64 sm:w-auto">
               <div className="flex sm:flex-col p-2">
-                {hours.map((hour) => (
+                {hours?.map((hour) => (
                   <Button
                     key={hour}
                     size="icon"
@@ -83,7 +83,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
             </ScrollArea>
             <ScrollArea className="w-64 sm:w-auto">
               <div className="flex sm:flex-col p-2">
-                {minutes.map((minute) => (
+                {minutes?.map((minute) => (
                   <Button
                     key={minute}
                     size="icon"

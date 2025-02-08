@@ -319,7 +319,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
         }
 
         setFileData(
-          rows.map((row) => {
+          rows?.map((row) => {
             const rowObject: ShiftAssign = {
               id: 0,
               employee_id: Number(row[headers.indexOf("employee_id")]),
@@ -554,7 +554,7 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
 
       <DataTable
         columns={columns}
-        data={shift_assigns}
+        data={shift_assigns || []}
         pageSize={limit}
         totalPages={totalPages}
         currentPage={page}
@@ -792,9 +792,9 @@ export default function ShiftAssignManagement({ session }: ShiftAssignManagement
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {fileData.map((row, index) => (
+                    {fileData?.map((row, index) => (
                       <TableRow key={index}>
-                        {Object.values(row).map((cell, index) => {
+                        {Object.values(row)?.map((cell, index) => {
                           if (Object.keys(row)[index] === "id") return null;
                           switch (Object.keys(row)[index]) {
                             case "employee_id":

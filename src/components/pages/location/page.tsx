@@ -263,7 +263,7 @@ export default function LocationManagement({ session }: LocationManagementProps)
 
       <DataTable
         columns={columns}
-        data={Locations}
+        data={Locations || []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}

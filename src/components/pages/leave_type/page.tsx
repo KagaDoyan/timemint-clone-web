@@ -299,7 +299,7 @@ export default function LeavetypeManagement({ session }: Leave_typeManagementPro
 
       <DataTable
         columns={columns}
-        data={leave_types}
+        data={leave_types || []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}

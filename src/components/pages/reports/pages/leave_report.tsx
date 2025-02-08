@@ -61,7 +61,7 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
 
 
   const handleExport = () => {
-    const worksheetData = leaves.map((leave) => ({
+    const worksheetData = leaves?.map((leave) => ({
       "ID": leave.id,
       "Leave Type": leave.leave_type?.leave_type,
       "Description": leave.reason,
@@ -90,7 +90,7 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
     <tr className="border-t animate-pulse">
       {Array(10)
         .fill(0)
-        .map((_, index) => (
+        ?.map((_, index) => (
           <td key={index} className="px-4 py-2">
             <div className="h-4 bg-gray-300 rounded"></div>
           </td>
@@ -175,9 +175,9 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
           <tbody>
             {isLoading ? (
               // Render 5 skeleton rows while loading
-              Array.from({ length: 5 }).map((_, idx) => <SkeletonRow key={idx} />)
+              Array.from({ length: 5 })?.map((_, idx) => <SkeletonRow key={idx} />)
             ) : leaves?.length > 0 ? (
-              leaves.map((leave) => (
+              leaves?.map((leave) => (
                 <tr key={leave.id} className="border-t">
                   <td className="px-4 py-2">{leave.id}</td>
                   <td className="px-4 py-2">{leave.leave_type?.leave_type}</td>

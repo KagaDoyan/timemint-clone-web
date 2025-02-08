@@ -47,7 +47,7 @@ export function VersionSwitcher({
             className="w-[--radix-dropdown-menu-trigger-width]"
             align="start"
           >
-            {versions.map((version) => (
+            {versions?.map((version) => (
               <DropdownMenuItem
                 key={version}
                 onSelect={() => setSelectedVersion(version)}

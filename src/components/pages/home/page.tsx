@@ -114,22 +114,22 @@ const HomePage = ({ session }: HomepageProp) => {
   }, [currentMonth]);
 
   // Check screen size to switch to 'day' view on small screens
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) { // Check for 'sm' screen size (640px or less)
-        setView("day");
-      } else {
-        setView("month");
-      }
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth < 640) { // Check for 'sm' screen size (640px or less)
+  //       setView("day");
+  //     } else {
+  //       setView("month");
+  //     }
+  //   };
 
-    handleResize(); // Set initial view on component mount
+  //   handleResize(); // Set initial view on component mount
 
-    window.addEventListener("resize", handleResize); // Update on window resize
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  //   window.addEventListener("resize", handleResize); // Update on window resize
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // }, []);
 
   const renderHeader = () => {
     // Filter leave requests
@@ -524,7 +524,7 @@ const HomePage = ({ session }: HomepageProp) => {
                     <div className="flex-grow relative flex flex-row space-x-1">
                       {myShifts?.map((shift) => {
                         const toMinutes = (time: string) => {
-                          const [hours, minutes] = time.split(":").map(Number);
+                          const [hours, minutes] = time.split(":")?.map(Number);
                           return hours * 60 + minutes;
                         };
 

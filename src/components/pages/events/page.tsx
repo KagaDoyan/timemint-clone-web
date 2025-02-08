@@ -350,7 +350,7 @@ export default function EventManagement({ session }: eventManagementProps) {
 
       <DataTable
         columns={columns}
-        data={events}
+        data={events ? events : []}
         pageSize={limit}
         currentPage={page}
         totalPages={totalPages}
