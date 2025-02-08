@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  app-dev:
+    image: web-dev:latest  # Use the dev image for development
+    container_name: docker-next-dev
+    ports:
+      - '4001:80'           # Map port 8080 on host to port 80 in container
+    environment:
+      NODE_ENV: development  # Set environment to development
+    volumes:
+      - .:/usr/src/app       # Bind mount for live code updates
+    networks:
+      - app-network
+    restart: always
+
+  app-prd:
+    image: web-prd:latest    # Use the prd image for production
+    container_name: docker-next-prd
+    ports:
+      - '80:80'              # Map port 80 on host to port 80 in container
+    environment:
+      NODE_ENV: production   # Set environment to production
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
