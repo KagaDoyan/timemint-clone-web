@@ -3,7 +3,7 @@ version: '3.5'
 services:
   att-dev:
     image: att-dev:latest  # Use the dev image for development
-    container_name: docker-next-dev
+    container_name: docker-att-dev
     ports:
       - '4001:80'           # Map port 8080 on host to port 80 in container
     environment:
