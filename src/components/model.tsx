@@ -97,4 +97,5 @@ export interface events {
     end: string
     date: string
     event_type: string
+    invites: Employee[]
 }

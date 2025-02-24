@@ -330,7 +330,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
   return (
     <div className="p-4 sm:p-8 space-y-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Role Management</h1>
+        <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Shift Management</h1>
         <Button onClick={openCreateDialog} className="flex items-center gap-2">
           <Plus size={16} /> Create Role
         </Button>

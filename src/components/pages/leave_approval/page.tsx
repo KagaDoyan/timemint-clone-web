@@ -63,7 +63,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
     const [openEmployee, setOpenEmployee] = useState(false);
     const [approveDialogOpen, setApproveDialogOpen] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-    
+
     const [rejectionRemark, setRejectionRemark] = useState('');
     const colomns = useMemo<ColumnDef<LeaveReqest>[]>(() => [
         {
@@ -267,13 +267,13 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                 });
                 setIsDialogOpen(false);
                 fetchData();
-        }).catch(error => {
-            toast({
-                title: "Error",
-                description: "Failed to approve leave request",
-                variant: "destructive",
-            });
-        })
+            }).catch(error => {
+                toast({
+                    title: "Error",
+                    description: "Failed to approve leave request",
+                    variant: "destructive",
+                });
+            })
     };
 
     const handleReject = async () => {
@@ -352,9 +352,12 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                             <ChevronDown className="opacity-50" />
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent className="p-0 w-full"> {/* Ensure PopoverContent is full width */}
                         <Command>
-                            <CommandInput placeholder="Search employee..." className="h-9" />
+                            <CommandInput
+                                placeholder="Search employee..."
+                                className="h-9 w-full" // Ensures the input spans the full width
+                            />
                             <CommandList>
                                 <CommandEmpty>No employee found.</CommandEmpty>
                                 <CommandGroup>
@@ -364,7 +367,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                                             value={employee.id.toString()}
                                             onSelect={(currentValue) => {
                                                 setEmpFilter(Number(currentValue) === empFilter ? null : Number(currentValue));
-                                                setOpenEmployee(false)
+                                                setOpenEmployee(false);
                                             }}
                                         >
                                             {employee.employee_no} {employee.name} ({employee.department})
@@ -506,7 +509,7 @@ function LeaveApprovalPage({ session }: LeaveApprovalPageProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            
+
             <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

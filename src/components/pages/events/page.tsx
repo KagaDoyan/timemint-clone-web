@@ -35,7 +35,7 @@ import { format, parse } from "date-fns"
 import { Plus } from 'lucide-react';
 import { cn } from "@/lib/utils"
 import dayjs from 'dayjs';
-import { events } from '@/components/model';
+import { Employee, events } from '@/components/model';
 import { useToast } from '@/hooks/use-toast';
 import { TimePicker } from '@/components/ui/timepicker';
 
@@ -75,6 +75,33 @@ export default function EventManagement({ session }: eventManagementProps) {
     from: new Date(),
     to: new Date(),
   })
+
+  const [employee, setEmployee] = useState<Employee[]>([]);
+  const [inviteOpen, setIsInvitePopoverOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredEmployees = employee.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/options`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch employees");
+      }
+
+      const data = await response.json();
+      setEmployee(data.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const handleDateChange = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -214,6 +241,7 @@ export default function EventManagement({ session }: eventManagementProps) {
   }, [limit, page, nameFilter]);
 
   useEffect(() => {
+    fetchEmployees();
     if (date) {
       setCurrentEvent(prev => ({ ...prev, start_date: dayjs(date?.from).format("DD-MM-YYYY") }))
       setCurrentEvent(prev => ({ ...prev, end_date: dayjs(date?.to).format("DD-MM-YYYY") }))
@@ -250,6 +278,7 @@ export default function EventManagement({ session }: eventManagementProps) {
           end: currentevent.end,
           event_type: currentevent.event_type,
           date: currentevent.date,
+          invites: currentevent.invites?.map(user => ({ id: user.id })) || [],
           ...(isEditing && { id: currentevent.id })
         })
       });
@@ -404,6 +433,83 @@ export default function EventManagement({ session }: eventManagementProps) {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="invite" className="text-right">
+                Invite
+              </Label>
+              <Popover open={inviteOpen} onOpenChange={setIsInvitePopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className="col-span-3 w-full justify-start text-left font-normal"
+                  >
+                    {currentevent.invites && currentevent.invites.length > 0
+                      ? currentevent.invites.map(user => user.name).join(", ")
+                      : "Select Users"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px]">
+                  <div className="p-4 space-y-4">
+                    <h3 className="text-lg font-medium">Select Users</h3>
+                    {/* Search Bar */}
+                    <Input
+                      placeholder="Search for an employee..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full"
+                    />
+                    {/* Employee List */}
+                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                      {filteredEmployees.length > 0 ? (
+                        filteredEmployees.map(user => (
+                          <div key={user.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id={`user-${user.id}`}
+                              checked={currentevent.invites?.some(u => u.id === user.id) || false}
+                              onChange={e => {
+                                const selectedUsers = currentevent.invites || [];
+                                if (e.target.checked) {
+                                  setCurrentEvent(prev => ({
+                                    ...prev,
+                                    invites: [...selectedUsers, user],
+                                  }));
+                                } else {
+                                  setCurrentEvent(prev => ({
+                                    ...prev,
+                                    invites: selectedUsers.filter(u => u.id !== user.id),
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`user-${user.id}`} className="text-sm">
+                              {user.name}
+                            </Label>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No employees found.</p>
+                      )}
+                    </div>
+                    {/* Actions */}
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setCurrentEvent(prev => ({
+                            ...prev,
+                            invites: [],
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                      <Button onClick={() => setIsInvitePopoverOpen(false)}>Done</Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="start" className="text-right">
                 Start
               </Label>
@@ -457,6 +563,7 @@ export default function EventManagement({ session }: eventManagementProps) {
                 placeholder="Enter Event description"
               />
             </div>
+
             {!isEditing ? (
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="start_date" className="text-right">
