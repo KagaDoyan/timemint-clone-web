@@ -657,7 +657,7 @@ const HomePage = ({ session }: HomepageProp) => {
                   </div>
                   <div className="text-sm text-gray-600">
                     <p>{event.description}</p>
-                    <p>Date: {dayjs(event.date).format("DD-MM-YYYY")}</p>
+                    <p>Date: {event.date}</p>
                     <p>Time: {event.start} - {event.end}</p>
                     <p>Description: {event?.description}</p>
                   </div>

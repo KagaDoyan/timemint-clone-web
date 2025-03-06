@@ -152,7 +152,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
     }
   };
 
-  // Fetch roles
+  // Fetch shifts
   const fetchShifts = async (limit: number = 10, page: number = 1, nameFilter: string = '') => {
     try {
       setIsLoading(true);
@@ -171,7 +171,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch roles');
+        throw new Error('Failed to fetch shifts');
       }
 
       const result: ShiftPaginationResponse = await response.json();
@@ -184,7 +184,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       } else {
         toast({
           title: 'Error',
-          description: result.error || "Failed to fetch roles",
+          description: result.error || "Failed to fetch shifts",
           variant: 'destructive',
         });
         setShifts([]);
@@ -193,7 +193,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         setCurrentPage(1);
       }
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      console.error('Error fetching shifts:', error);
       toast({
         title: 'Error',
         description: "Network error occurred",
@@ -213,7 +213,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
     // fetchDepartments();
   }, [limit, page, nameFilter]);
 
-  // Create or update role
+  // Create or update shift
   const handleSaveShift = async () => {
     try {
       if (!currentShift.name?.trim()) {
@@ -268,7 +268,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         });
       }
     } catch (error) {
-      console.error('Error saving role:', error);
+      console.error('Error saving shift:', error);
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : "Network error occurred",
@@ -277,7 +277,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
     }
   };
 
-  // Delete role
+  // Delete shift
   const handleDeleteShift = async (id: string) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shifts/${id}`, {
@@ -311,7 +311,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         });
       }
     } catch (error) {
-      console.error('Error deleting role:', error);
+      console.error('Error deleting shift:', error);
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : "Network error occurred",
@@ -332,7 +332,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <h1 className="text-xl sm:text-2xl font-bold w-full text-center sm:text-left">Shift Management</h1>
         <Button onClick={openCreateDialog} className="flex items-center gap-2">
-          <Plus size={16} /> Create Role
+          <Plus size={16} /> Create Shift Time
         </Button>
       </div>
 
@@ -359,7 +359,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Edit Role' : 'Create Role'}
+              {isEditing ? 'Edit Shift' : 'Create Shift'}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -374,7 +374,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
                   setCurrentShift(prev => ({ ...prev, name: e.target.value }))
                 }
                 className="col-span-3"
-                placeholder="Enter role name"
+                placeholder="Enter shift name"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -388,7 +388,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
                   setCurrentShift(prev => ({ ...prev, description: e.target.value }))
                 }
                 className="col-span-3"
-                placeholder="Enter role name"
+                placeholder="Enter shift description"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -475,7 +475,7 @@ export default function ShiftManagement({ session }: ShiftPageProps) {
               Are you sure?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the role.
+              This will permanently delete the shift.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
