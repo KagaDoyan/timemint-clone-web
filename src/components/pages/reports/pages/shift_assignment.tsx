@@ -67,6 +67,7 @@ const ShiftAssignmentReportPage: React.FC<ShiftAssignmentReportPageProps> = ({ s
       "Description": shift.shift?.description,
       "Start Time": shift.shift?.start_time,
       "End Time": shift.shift?.end_time,
+      "Employee ID": shift.employee?.employee_no,
       "Employee Name": shift.employee?.name,
       "Employee Email": shift.employee?.email,
       "Employee Phone": shift.employee?.phone,
@@ -165,6 +166,7 @@ const ShiftAssignmentReportPage: React.FC<ShiftAssignmentReportPageProps> = ({ s
               <th className="px-4 py-2">Description</th>
               <th className="px-4 py-2">Start</th>
               <th className="px-4 py-2">End</th>
+              <th className="px-4 py-2">Employee ID</th>
               <th className="px-4 py-2">Employee</th>
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Phone</th>
@@ -184,6 +186,7 @@ const ShiftAssignmentReportPage: React.FC<ShiftAssignmentReportPageProps> = ({ s
                   <td className="px-4 py-2">{shift.shift?.description}</td>
                   <td className="px-4 py-2">{shift.shift?.start_time}</td>
                   <td className="px-4 py-2">{shift.shift?.end_time}</td>
+                  <td className="px-4 py-2">{shift.employee?.employee_no}</td>
                   <td className="px-4 py-2">{shift.employee?.name}</td>
                   <td className="px-4 py-2">{shift.employee?.email}</td>
                   <td className="px-4 py-2">{shift.employee?.phone}</td>

@@ -67,6 +67,8 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
       "Description": leave.reason,
       "Start": leave.start_date,
       "End": leave.end_date,
+      "Full Day": leave.full_day ? "Yes" : "No",
+      "Employee ID": leave.employee?.employee_no,
       "Name": leave.employee?.name,
       "Email": leave.employee?.email,
       "Phone": leave.employee?.phone,
@@ -165,6 +167,7 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
               <th className="px-4 py-2">Description</th>
               <th className="px-4 py-2">Start Time</th>
               <th className="px-4 py-2">End Time</th>
+              <th className="px-4 py-2">Employee ID</th>
               <th className="px-4 py-2">Employee Name</th>
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Phone</th>
@@ -184,6 +187,7 @@ const LeaveReportPage: React.FC<LeaveReportPageProps> = ({ session }) => {
                   <td className="px-4 py-2">{leave.reason}</td>
                   <td className="px-4 py-2">{leave.start_date}</td>
                   <td className="px-4 py-2">{leave.end_date}</td>
+                  <td className="px-4 py-2">{leave.employee?.employee_no}</td>
                   <td className="px-4 py-2">{leave.employee?.name}</td>
                   <td className="px-4 py-2">{leave.employee?.email}</td>
                   <td className="px-4 py-2">{leave.employee?.phone}</td>
